@@ -1,0 +1,28 @@
+\subsection{Prevalence of parallelism}
+As of 2014, many desktop machines contain 4-core \acp{CPU}, capable of scheduling 8 hardware threads simultaneously.
+Depending on whether they are aiming for performance or portability, typical laptop systems contain between 2 and 4 cores.
+Most commodity systems will attempt to improve performance by scheduling a user's tasks across underutilised cores, in order to avoid preemption. This still leaves sequential algorithms facing the bottleneck of a single core's rate of computation.
+
+The other common source of potential parallelism within systems results from advances in computer graphics.
+
+\acp{GPU} are responsible for performing many computational stages of the graphics pipeline. They are highly parallel devices, tailored for high performance manipulation of pixel data. The popularity of playing games on home computers has led demand for increasingly powerful \acp{GPU}, producing a more responsive experience for consumers.
+
+In recent generations, hardware manufacturers have explored combining specialised processing units, such as \ac{GPU}, along with \ac{CPU} on a single die. These hybrid devices, known as \ac{APU}, often boast high transfer rates between components. They often allow modest graphical performance within a portable, low power device. As such, many laptops will contain an \ac{APU} as instead of two discrete devices.
+
+Several libraries have been developed to facilitate computation on hardware previously reserved for the graphics pipeline. As a result, \acp{GPU} capable of executing custom code in addition to their traditional roles are often referred to as \acp{GPGPU}.
+Lately, there has been a noticeable increase of interest in \ac{GPGPU} computing and its suitability for common data-driven problems.
+
+\begin{figure}
+  \begin{tabular}{ | c | c | c |}
+    \hline
+    System & Components & Discrete device count \\ \hline
+    Desktop (pre 2010) & \ac{CPU} and \ac{GPU} & 2 \\ \hline
+    Desktop & \ac{APU} and \ac {GPU} & 3 \\ \hline
+    Portable laptop & \ac{APU} & 2 \\ \hline
+    Headless server & \ac{CPU} & 1 \\ \hline
+    \end{tabular}
+  \caption{Components capable of parallel code execution, present in typical systems.}
+  \label{fig:par_table}
+\end{figure}
+
+In short, most conventional computer systems purchased today will contain more than one available parallel processing device. A selection of common, parallel hardware configurations are detailed in Figure~\ref{fig:par_table}.
