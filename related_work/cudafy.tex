@@ -1,0 +1,9 @@
+\subsection{CUDAfy.NET}
+The stated goal of the CUDAfy.NET\cite{cudafy} project is to allow "easy development of high performance \ac{GPGPU} applications completely from the Microsoft .NET framework".
+
+CUDAfy completely bypasses the need to write custom kernel code, either directly crafted or indirectly generated through an API. It performs code generation by examining the source code of dispatched methods at runtime, translating the \ac{CLR} bytecode to generate equivalent \ac{OpenCL} kernels.
+
+CUDAfy benefits from significantly increased usability due to generating \ac{OpenCL} kernels on behalf of the programmer. However, it does not have a high enough level of abstraction to avoid vastly altering the calling code's structure. The programmer's workflow is vastly altered when parallelising calculations. Anyone writing parallel CUDAfy code must still concern themselves with explicitly detecting onboard devices. In addition, the transfer of data to and from a \ac{CPU}/\ac{GPGPU} must be triggered manually.
+
+\paragraph{Divergences}
+Instead of requiring explicit device and memory management, this project aims to ensure that programmers do not have to concern themselves with such concepts in order to parallelise computation. It should be sufficient to solely provide the calculations that are to be executed, after stating that code should run on a particular device. Requiring any more interaction increases the mental taxation resultant from using the library.
