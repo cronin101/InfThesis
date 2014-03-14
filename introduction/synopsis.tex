@@ -1,4 +1,18 @@
 \subsection{Recap of motivations for research}
+\begin{itemize}
+\item Improvements in sequential execution performance are lacking, thus a switch to parallelism is necessary.
 
+\item There is a lack of software developers sufficiently experienced with parallel programming.
+
+\item Without parallel execution of code, much of the potential throughput of a modern system is wasted.
+
+\item Easing parallelisation of primitives will let novice developers achieve greater device utilisation.
+\end{itemize}
 
 \subsection{Brief description of proposed solution}
+The proposed solution is a plug-in library that allows standard-library functions to be automatically executed in parallel, without complicating the calling code.
+This will allow investigation into the advantages of naively distributing computation over multiple compute-units.
+
+By remaining as similar as possible to standard library code, and requiring no prior knowledge of parallel program construction, novice users will be able to benefit from any increased throughput.
+
+The produced library should be assessed on ease-of-use and performance. Clearly demonstrating the benefits of the library will allow developers to recognise if and when its inclusion would be beneficial to a personal project.
