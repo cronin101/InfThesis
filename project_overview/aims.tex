@@ -10,7 +10,7 @@ Dynamic, interpreted languages are commonly celebrated for their increased expre
 
 RubiCL aims to investigate and mitigate any decreased performance when using the Ruby language for data processing. By producing a more efficient implementation of computational tasks, users will be able to tackle larger scale problems without needing to learn new toolchains.
 
-\paragraph{Indicators of success}
+\paragraph*{Indicators of success}
 Progress towards this goal can be evaluated by comparing the performance of Ruby implementations of tasks, before and after optimisation, to implementations in static languages. Further success can be measured by investigating whether increased magnitude computation terminates within reasonable time, due to the project's contributions.
 
 \subsection{Facilitating a larger scale of experimentation in a REPL environment by non-expert users}
@@ -39,7 +39,7 @@ dataset_2.mean
 
 By widening the scope of problems that can be evaluated within a \ac{REPL}. RubiCL shall enable investigation into trends, unavailable available to novice users previously due to the scale of input data.
 
-\paragraph{Indicators of success}
+\paragraph*{Indicators of success}
 The completely library should be presented to novice analysts, users with mathematical insight but insignificant programming prowess. If they are able to easily answer queries about large datasets, the system's design will be judged as successful. As with the previous goal's evaluation, response time with in a \ac{REPL} environment will be examined.
 
 \subsection{Exploring the extensibility of the Ruby programming language}
@@ -65,7 +65,7 @@ Since function invocation uses a \emph{method-sending} approach, the underlying 
 
 This project demonstrates integrating drastically different processing techniques into the language's runtime. It achieves this without greatly affecting the code that a user must write in order to utilise them.
 
-\paragraph{Indicators of success}
+\paragraph*{Indicators of success}
 The integration will be successful if the interface for processing data remains consistent. Parallelism should be implicit and not requiring direction from the programmer. Again, user testing will evaluate this.
 
 \subsection{Applicability to a variety of platforms, avoiding over-tailoring for a specific machine}
@@ -73,5 +73,5 @@ The project should be package in a manner that facilitates installation onto a n
 
 As a result, no assumptions about the specific hardware present can be made, apart from \ac{OpenCL} support. This will allow the project to support a range of current and future compute devices.
 
-\paragraph{Indicators of success}
+\paragraph*{Indicators of success}
 Deployment of the system to new hardware will be attempted after the development phase has concluded. If the system remains performant and the deployment procedure does not require change, this is evidence of sufficient hardware agnosticism.

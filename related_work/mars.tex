@@ -9,7 +9,7 @@ One shortcoming of MARS is its reliance on the MapReduce computation pattern for
 
 Another disadvantage of MARS is the need to write the individual task code as \ac{CUDA} source files. This is inconvenient for any programmer lacking prior knowledge of parallel programming. To utilise MARS effectively, you must first become familiar with \ac{CUDA} programming.
 
-\paragraph{Divergences}
+\paragraph*{Divergences}
 Instead of taking a large-scale computation pattern and mapping it to \ac{GPGPU} architectures, this project will start by providing interfaces to primitive operations that such devices are suited for. A suite of expressive operations, composed from efficient subcomponents will then be produced.
 
 Following this work-flow should enable the finished library to achieve a significant performance benefits, as it centres around tasks that the target hardware is well suited to.
