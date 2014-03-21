@@ -125,7 +125,78 @@ Where possible, all methods return the device context to allow method chaining.
 
   \item[snds] Like the previous method, but keeps only the second elements.
 
+  \item[braid(\&Block)] Collapses a buffer containing a list of tuples into a list of single values, using the provided combination function.
+
+  \item[map(\&Block)] Mutates all elements within the buffer using the provided function.
+
+  \item[filter(\&Block)] Rejects elements from the buffer that do not pass the provided predicate function. Aliased also as \verb|select| to be consistent with the Ruby standard library.
+
+  \item[scan(Style, Pperator)] Produces an array of intermediate results, equivalent to traversing the array and applying the reduction operator up until each point. Inclusive or exclusive option set via parameter, inclusive by default.
+
+
+  \item[sum] Returns the summation of all values in the buffer.
+
+  \item[count(Value)] Returns the number of times that the given value appears in the buffer.
 \end{description}
+
+\item[LambdaBytecodeParser]
+Receives an anonymous Ruby function during instantiation and returns a set of equivalent C expressions on demand. The details of this procedure will be explained in the \emph{Implementation} chapter. This translation stage enables the library to operate when the user states a problem in standard Ruby syntax only.
+
+\paragraph*{Interface:}
+\begin{description}
+  \item[to\_infix] Returns the function supplied to the constructor in infix form, using C syntax.
+\end{description}
+
+\item[Logger]
+A singleton used to log key actions to the terminal or disk, facilitating debugging. The current log level set determines whether output will be produced. Enables debug mode to be toggled in a single location.
+
+\paragraph*{Interface:}
+\begin{description}
+  \item[loud\_mode] Causes any logged actions to be displayed in the terminal.
+
+  \item[quiet\_mode] Ensures logged actions do not appear in the terminal.
+
+  \item[show\_timing\_info=] Toggles whether segmented timing analysis appears before produced computation results.
+\end{description}
+
+\item[TaskKernelGenerator]
+Instantiated with a \verb|Task| object, the \verb|TaskKernelGenerator| assembles an \ac{OpenCL} kernel performing the task. It handles the majority of \ac{OpenCL} kernel boilerplate, with the task only providing specific computational operations.
+
+\paragraph*{Interface:}
+\begin{description}
+  \item[create\_kernel] Returns the kernel source for the given task.
+\end{description}
+
+\item[Task]
+An abstract superclass representing a stage in the computation pipeline. Subclassed with the specific type of operation. Provides tracking of variables required, computation statements and each task's unique title.
+
+\paragraph*{Interface:}
+\begin{description}
+  \item[descriptor] A pretty-printed description of the task. Provides its name alongside a summary of actions performed.
+
+  \item[to\_kernel] Returns the full \ac{OpenCL} source of the task, obtained through the \verb|TaskKernelGenerator|.
+
+  \item[fuse!(Map)] Present on \verb|Map| tasks, allows a following \verb|Map| task to be combined with the current task.
+
+  \item[fuse!(Filter)] Present on \verb|Filter| tasks, allows a following \verb|Filter| task to be combined with the current task.
+
+  \item[pre\_fuse!(Map)] Present on \verb|MapFilter| tasks, prepends the previous \verb|Map| task's statements to the current task.
+
+  \item[post\_fuse!(Map)] Present on \verb|MapFilter| tasks, appends the following \verb|Map| task's statements to the current task.
+\end{description}
+
+\item[TaskQueue]
+Stores the entire computation pipeline of the current execution chain. Enqueued tasks are appended to the queue. When a result is requested, the entire queue is optimised and then dispatched in as few tasks as possible. The rules for queue optimisation are discussed in the \emph{Implementation} chapter.
+
+\paragraph*{Interface:}
+\begin{description}
+  \item[push(Task)] Adds a \verb|Task| onto the end of the queue.
+
+\item[shift] Removes the first \verb|Task| from the queue and returns it.
+
+\item[simplify!] Compresses the \verb|TaskQueue| by performing \emph{fusion} optimisations.
+\end{description}
+
 
 \end{description}
 

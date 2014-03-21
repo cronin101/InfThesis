@@ -43,7 +43,7 @@ By widening the scope of problems that can be evaluated within a \ac{REPL}. Rubi
 The completely library should be presented to novice analysts, users with mathematical insight but insignificant programming prowess. If they are able to easily answer queries about large datasets, the system's design will be judged as successful. As with the previous goal's evaluation, response time with in a \ac{REPL} environment will be examined.
 
 \subsection{Exploring the extensibility of the Ruby programming language}
-Ruby has served as a suitable foundation for many \acp{DSL}, including build tools\cite{rake} and web frameworks\cite{sinatra}. 
+Ruby has served as a suitable foundation for many \acp{DSL}, including build tools\cite{rake} and web frameworks\cite{sinatra}.
 
 The language has open classes, whereby the structure of object classes can still be altered, even after definition ends. It also permits a variety of meta-programming techniques, allowing complicated code to appear misleadingly simple.
 
@@ -67,6 +67,18 @@ This project demonstrates integrating drastically different processing technique
 
 \paragraph*{Indicators of success}
 The integration will be successful if the interface for processing data remains consistent. Parallelism should be implicit and not requiring direction from the programmer. Again, user testing will evaluate this.
+
+\subsection{Effective code generation and reuse on the \ac{OpenCL} platform}
+\ac{OpenCL} can provide high throughput computation, often utilised by bespoke systems such as cryptographic hashers and video encoders. However, there is significant configuration and set-up code associated with each parallel tasks performed. Code reuse is difficult to achieve on the \ac{OpenCL} platform due to the specificity of kernel execution.
+
+Without techniques for reuse, advances made by one parallel project may not be applicable to others. Programmers writing parallel systems must implement all subtasks from the bottom up when constructing the full solution. As it is hard to incorporate the partial solutions of others, barriers to entry are further increased.
+
+The project undertaken will attempt to recycle the partial solutions of primitives as much as possible. This allows investigate into how much reuse is possible, given an ideal system with a single author.
+
+With code reuse, optimisations of a given subtask will improve all primitives utilising the component. This directs experimentation when searching for performance improvements.
+
+\paragraph*{Indicators of success}
+Unfortunately, code reuse is often measured subjectively. Yet, the developer's opinion when reflecting on the development experience may provide useful insight. If code reuse techniques facilitate the development of this particular \ac{OpenCL} project, it is likely that they may be beneficial to developers elsewhere.
 
 \subsection{Applicability to a variety of platforms, avoiding over-tailoring for a specific machine}
 The project should be package in a manner that facilitates installation onto a new supported system. In addition, it should achieve performance enhancement without having to be adjusted significantly by the user.

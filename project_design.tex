@@ -3,12 +3,69 @@
 \section{System architecture}
 \input{./design/architecture.tex}
 
-\section{Interface choices}
+\section{Design choices}
+\todo{Include more design choices}
 \subsection{Type annotation}
+When parallelising computation using the RubiCL library, a dataset is initially `cast' to the C-type equivalent. To signify the end of a computation it is finally `cast' back to the Ruby type.
 
-\section{Implementation choices}
-\subsection{Type conversion}
+This method of redirecting a method chain using a wrapped object is intentionally similar to \verb|Enumerable#lazy| in Ruby's standard library.
 
-\subsection{Data transfer}
+\verb|Enumerable#lazy| allows computation to be deferred until is known how many results are needed. In some cases, such as the example presented in Figure~\ref{lst:example_lazy}, computation can be avoided when the results would be discarded.
 
-\subsection{Task optimisation}
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:example_lazy,
+  caption=Redirecting a computation through Enumerable\#lazy.
+]
+def side_effect_increment(x, str)
+  puts str
+  x + 1
+end
+
+(1..5).map { |x| side_effect_increment x, "Non-lazy" }
+    .take_while { |x| x < 4 }
+# => [2, 3]
+
+(1..5).lazy
+    .map { |x| side_effect_increment x, "Lazy" }
+    .take_while { |x| x < 4 }
+    .to_a
+# => [2, 3]
+
+# Non-lazy function evaluates function 5 times:
+# >> Non-lazy
+# >> Non-lazy
+# >> Non-lazy
+# >> Non-lazy
+# >> Non-lazy
+# Lazy function evaluates function 3 times:
+# >> Lazy
+# >> Lazy
+# >> Lazy
+\end{lstlisting}
+
+Keeping the usage akin to a conceptually similar feature should make the library easier to get to grips with.
+
+\subsection{Eager or deferred task dispatching}
+During system design, the decision had to be made whether to eagerly evaluate parallel primitives or to buffer all requests and then dispatch when a result is requested. This choice is not straightforward as there are benefits to either option.
+
+\paragraph*{Advantages of eager dispatch}
+\begin{itemize}
+\item The kernel build and execution stages can be pipelined. For example, this allows the code generation and compilation stages to execute on the host \ac{CPU} while the previous task is executing on the \ac{GPU}.
+
+\item Compute device can easily be changed mid-chain. Although it will suffer a performance penalty due to the need to transfer the data buffer, having the buffer always in a consistent state allows a device well-suited in a particular primitive to pick up where another left off.
+
+\item Simplicity. No need to study equivalence rules.
+\end{itemize}
+
+\paragraph*{Advantages of deferred pipeline}
+\begin{itemize}
+\item Fewer resultant \verb|Task|s to schedule. Since adjacent combinable tasks are fused, there is less work done by the \ac{OpenCL} compiler and work-group scheduler.
+
+\item Fewer accesses to global device memory. In the setup phase of each kernel, the elements to be transformed are loaded from the global device buffer into local storage. When multiple tasks are combined into one kernel, the intermediate result remains in unsynchronised memory until the task finalizes. This causes much less stress on the compute-device's memory subsystem.
+
+\item Fewer work-units scheduled. It is a waste of iterations to have $3$ \verb|for-loop|s each modify a collection when all operations could occur in a single loop. It is similarly wasteful to execute $N$ work-units $3$ times when only $N$ are needed.
+\end{itemize}
+
+\todo{ Justify choice to defer pipeline }
+
