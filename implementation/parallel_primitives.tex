@@ -273,7 +273,7 @@ At first, it may appear complicated. However, when nodes $b_i \in B$ are reorder
   \end{center}
 \end{figure}
 
-This suggests that \verb|scatter|, when using unique indices, is \emph{embarassingly parallel}. Like \verb|map|, this produces an easy-to-understand parallel conversion, shown in Algorithm~\ref{alg:parscatter}.
+This suggests that \verb|scatter|, when using unique indices, is \emph{embarrassingly parallel}. Like \verb|map|, this produces an easy-to-understand parallel conversion, shown in Algorithm~\ref{alg:parscatter}.
 
 \begin{algorithm}
   \caption{\emph{Permutation Scatter} primitive with parallel execution.}
@@ -287,6 +287,7 @@ This suggests that \verb|scatter|, when using unique indices, is \emph{embarassi
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
+
 \paragraph*{Equivalent \ac{OpenCL} kernel design}
 \begin{algorithm}
   \caption{\emph{Permutation Scatter} primitive in \ac{OpenCL} kernel form.}
@@ -398,6 +399,30 @@ Furthermore, since \verb|map| followed by \verb|scan| is cost $O(n) + O(n) = O(n
 \subparagraph*{Counting the number of kept elements}
 Following the calculation of dependencies $1$ and $2$, obtaining $3$ is trivial. It is simply the final element of the prefix-sum buffer. This can be retrieved by a single lookup after the other sub-problems have been solved.
 
-\todo{Explain how this just uses the previous operators}
+\paragraph*{Complete solution}
+By utilising \verb|map|, \verb|scan|, and a conditional-modified \verb|scatter|, \verb|filter| can be performed with cost $O(n) + O(n) + O(1) + O(n) = O(n)$. This is identical to the sequential algorithm presented earlier and is therefore \emph{cost-optimal}. Again, this suggests that \verb|filter| tasks can benefit from increased throughput when scheduled across multiple compute-units.
+
+The combined process is demonstrated in Algorithm~\ref{alg:parfilter}.
+
+\begin{algorithm}
+  \caption{\emph{Filter} higher-order function with parallel execution, composed from other primitives.}
+  \label{alg:parfilter}
+
+  \begin{algorithmic}
+    \Function{ParFilter}{$A, p$}
+    \State{$P \Leftarrow$ \Call{ParMap}{$A, p$}}
+    \State{$I \Leftarrow$ \Call{ParScan}{$P, +$}}
+    \State{$B \Leftarrow$ \Call{Zeros}{$I_{\|I\|}$}}
+    \PFor{$a_i \in A$}
+      \If{$P_i$}
+        \State{$B_{I_i - 1} \Leftarrow A_i$}
+      \EndIf
+    \EndPFor
+    \State{$A \Leftarrow B$}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The parallel loop body is a modified version of the \verb|scatter| task. The divergence is that it only performs scattering if the predicate element is set.
 
 \subsection{Sort}
