@@ -28,7 +28,7 @@ The dependency graph for a \verb|map| of $\|A\| = 6$ is shown in Figure~\ref{fig
       [scale=.8,auto=left,every node/.style={circle}]
 
       \foreach \el/\x/\val in {n1/1/a_1, n2/2/a_2, n3/3/a_3, n4/4/a_4, n5/5/a_5, n6/6/a_6}
-        \node (\el) at (\x, 0) {$\val$};
+        \node (\el) at (2 * \x, 0) {$\val$};
 
       \foreach \el/\x/\val in {n1/1/a_1, n2/2/a_2, n3/3/a_3, n4/4/a_4, n5/5/a_5, n6/6/a_6}
         \path (\el) edge [anchor=center,loop above] node {} (\el);
@@ -162,12 +162,40 @@ However, this does not mean that all hope is lost. It is possible to efficiently
 \begin{figure}[h]
 \begin{center}
   \includegraphics[width=0.8\textwidth]{./figures/oddeven.pdf}
-  \caption{An example of parallelised \emph{inclusive scan} using the \emph{odd-even} algorithm}
+  \caption{An example of parallelised \emph{inclusive scan} using the \emph{odd-even} algorithm, detailed in Algorithm~\ref{alg:parscan}}
   \label{fig:odd_even}
 \end{center}
 \end{figure}
 
-\todo{Display odd-even algorithm?}
+\begin{algorithm}
+  \caption{Odd-even style \emph{Scan} higher-order function with parallel execution.}
+  \label{alg:parscan}
+
+  \begin{algorithmic}
+    \Function{ParScan}{$f, A$}
+      \State{$level \Leftarrow 2$}
+
+      \While{$level <= \|A\|$}
+        \PFor{$l \in (level\ldots2 \times level\ldots\|A\|)$}
+          \State{$A_l \Leftarrow$ \Call{$f$}{$A_l, A_{l - \frac{level}{2}}$}}
+        \EndPFor
+        \State{$level \Leftarrow 2 \times level$}
+      \EndWhile
+
+      \If{$level = \|A\|$}
+      \State{$level \Leftarrow \frac{level}{2}$}
+      \EndIf
+
+      \While{$level > 1$}
+      \PFor{$l \in (level + \frac{level}{2}\ldots2 \times level + \frac{level}{2}\ldots\|A\|)$}
+          \State{$A_l \Leftarrow$ \Call{$f$}{$A_l, A_{l - \frac{level}{2}}$}}
+        \EndPFor
+        \State{$level \Leftarrow \frac{level}{2}$}
+      \EndWhile
+
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 
 A parallel algorithm's \emph{cost} is defined as its asymptotic runtime multiplied by the required number of compute-units.
 
@@ -177,4 +205,87 @@ Importantly, it is \emph{cost-optimal}, meaning that its cost is equal to that o
 
 This discovery suggests that it is possible to increase the throughput of \verb|scan| tasks significantly, by scheduling them across massively parallel \ac{OpenCL} devices.
 
+\subsection{Scatter}
+The \verb|Scatter| primitives receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
+
+\verb|Scatter| is useful for reordering a collection or projecting a subset of an input dataset into an output dataset.
+
+\begin{algorithm}
+  \caption{\emph{Scatter} primitive with sequential execution.}
+  \label{alg:seqscatter}
+
+  \begin{algorithmic}
+    \Function{SeqScatter}{$A, I, B$}
+      \ForAll{$a_i \in A$}
+      \State{$B_{I_i} \Leftarrow A_i$}
+      \EndFor
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+\paragraph*{Two types of scatter}
+It is important to draw attention to an important distinction in types of \verb|scatter| operation. \emph{Permutation Scatter} is defined as a scatter operation where all $i \in I$ are unique. Therefore, there are no two writes to the same destination in $B$. Other forms of \verb|scatter| increase complexity, as rules that state how to handle write collisions within the transaction must be introduced.
+
+Luckily, for this project's needs we only need to analyse the simpler \emph{permutation scatter}. We can assume that no two writes to the same destination offset will occur.
+
+\begin{figure}[h]
+  \caption{\emph{Permutation Scatter} dependency graph}
+  \label{fig:scatgraph1}
+  \begin{center}
+    \begin{tikzpicture}
+      [scale=.8,auto=left,every node/.style={circle}]
+
+      \foreach \x in {1, 2, 3, 4, 5} {
+        \node (a\x) at (2 * \x, 3) {$a_{\x}$};
+        \node (b\x) at (2 * \x, 0) {$b_{\x}$};
+        \node (i\x) at (2 * \x, -3){$i_{\x}$};
+      }
+
+      \foreach \s/\d in {1/5, 2/3, 3/1, 4/2, 5/4}{
+        \draw[->] (b\d) -- (a\s);
+        \draw[->] (b\d) -- (i\s);
+      }
+
+    \end{tikzpicture}
+  \end{center}
+\end{figure}
+A data-dependency graph for a typical scatter operation is shown in Figure~\ref{fig:scatgraph1}.
+At first, it may appear complicated. However, when nodes $b_i \in B$ are reordered by their data-source, a valid partitioning becomes clear. The result of this simplification is shown in Figure~\ref{fig:scatgraph2}.
+
+\begin{figure}[h]
+  \caption{\emph{Permutation Scatter} dependency graph, simplified.}
+  \label{fig:scatgraph2}
+  \begin{center}
+    \begin{tikzpicture}
+      [scale=.8,auto=left,every node/.style={circle}]
+
+      \foreach \s/\d in {1/5, 2/3, 3/1, 4/2, 5/4}{
+        \node (a\s) at (2 * \s, 2) {$a_{\s}$};
+        \node (b\d) at (2 * \s, 0) {$b_{\d}$};
+        \node (i\s) at (2 * \s, -2){$i_{\s}$};
+        \draw[->] (b\d) -- (a\s);
+        \draw[->] (b\d) -- (i\s);
+      }
+    \end{tikzpicture}
+  \end{center}
+\end{figure}
+
+This suggests that \verb|scatter|, when using unique indices, is \emph{embarassingly parallel}. Like \verb|map|, this produces an easy-to-understand parallel conversion, shown in Algorithm~\ref{alg:parscatter}.
+
+\begin{algorithm}
+  \caption{\emph{Permutation Scatter} primitive with parallel execution.}
+  \label{alg:parscatter}
+
+  \begin{algorithmic}
+    \Function{ParScatter}{$A, I, B$}
+      \PFor{$a_i \in A$}
+      \State{$B_{I_i} \Leftarrow A_i$}
+      \EndPFor
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 \subsection{Filter}
+
+\todo{Explain how this just uses the previous operators}
+
+\subsection{Sort}
