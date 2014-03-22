@@ -37,7 +37,7 @@ The dependency graph for a \verb|map| of $\|A\| = 6$ is shown in Figure~\ref{fig
   \end{center}
 \end{figure}
 
-When analysing data flow graphs, such as the one above, any partitioning that doesn't sever edges denotes a valid parallel strategy. Since Figure~\ref{fig:mapgraph} contains no inter-node dependencies, it is trivial to schedule the task concurrently on many compute units.
+When analysing data-dependency graphs, such as the one above, any partitioning that doesn't sever edges denotes a valid parallel strategy. Since Figure~\ref{fig:mapgraph} contains no inter-node dependencies, it is trivial to schedule the task concurrently on many compute units.
 
 \algblockdefx[Pf]{PFor}{EndPFor}{\textbf{in parallel, for} }{\textbf{end parallel for}}
 \begin{algorithm}
@@ -134,8 +134,6 @@ Instead of returning the final result, Scan returns a vector that is equal to th
 
 Unlike sequential \verb|map|, iteration $i$ now reads from both $a_{i-1}$ and $a_{i}$ in addition to writing $a_i$. This produces a data-dependency graph with greater connectedness, shown in Figure~\ref{fig:scangraph}
 
-\todo{stop flipping between dependency and flow}
-
 \begin{figure}[h]
   \caption{\emph{Inclusive Scan} dependency graph}
   \label{fig:scangraph}
@@ -157,5 +155,26 @@ Unlike sequential \verb|map|, iteration $i$ now reads from both $a_{i-1}$ and $a
   \end{center}
 \end{figure}
 
+It is clear that no partitioning of this graph exists that does not sever edges. Therefore, this task is not embarrassingly parallel.
+
+However, this does not mean that all hope is lost. It is possible to efficiently parallelise a \verb|scan| task, but it requires performing computation split over multiple \emph{stages}. One method for achieving this is demonstrated in Figure~\ref{fig:odd_even}.
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{./figures/oddeven.pdf}
+  \caption{An example of parallelised \emph{inclusive scan} using the \emph{odd-even} algorithm}
+  \label{fig:odd_even}
+\end{center}
+\end{figure}
+
+\todo{Display odd-even algorithm?}
+
+A parallel algorithm's \emph{cost} is defined as its asymptotic runtime multiplied by the required number of compute-units.
+
+
+The \emph{odd-even} prefix sum algorithm can process a dataset of size $n$ in $O(\log n) + \frac{O(n)}{\|CU\|}$ stages of execution. This gives a cost of $O(\|CU\| \log n) + O(n)$.
+Importantly, it is \emph{cost-optimal}, meaning that its cost is equal to that of the best-known sequential algorithm, when $\|CU\| = O(\frac{n}{\log n})$. This is an entirely reasonable assumption given large datasets and the number of compute-units ($4-48$) present on commodity \ac{OpenCL} devices.
+
+This discovery suggests that it is possible to increase the throughput of \verb|scan| tasks significantly, by scheduling them across massively parallel \ac{OpenCL} devices.
 
 \subsection{Filter}

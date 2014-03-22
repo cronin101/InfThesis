@@ -12,11 +12,111 @@ The project will provide functionality to users through utilisation of two previ
 
 \section{Project Progression}
 \subsection{Timeline}
+\paragraph*{Initial focus}
+In the project's first year, most of the time was spent researching existing parallel frameworks. The project's initial goal was to present a \emph{MapReduce} runtime. Therefore, systems like \verb|Phoenix++|\cite{phoenix++} and \verb|StreamMR|\cite{streammr} were evaluated.
+
+Part-way through the year, during prototyping, it became clear that there are several disadvantages to producing (yet-another) \emph{MapReduce} system:
+\begin{itemize}
+\item The runtime resource management is overkill on a singular, massively parallel machine. When isolated failure is unlikely, more lightweight processing paradigms can be used with greater efficiency.
+
+\item Previous projects have hit issues caused by \ac{GPGPU} architecture. For example, tasks that emit tuples must be run twice: Once to count the number of tuples emitted, and again to actually produce the results. This is needed as \ac{OpenCL} kernels do not allow dynamic allocation of memory.
+
+\item Since \ac{OpenCL} compute devices execute only kernels, there are just two options for task specification:
+
+Firstly, users can specify tasks in \ac{OpenCL} kernel form. This is terrible for system usability. Products such as \emph{Hadoop} are successful due to features such as the \emph{streaming \ac{API}}, allowing code to be written in familiar languages when performing parallel tasks on tuple streams.
+
+Secondly, the system could translate an existing language into \ac{OpenCL} kernels. This would allow users to stay within their comfort zone yet still utilise the parallel architecture of many modern systems. Unfortunately, this task is an enormous undertaking. Progress has made recently on generating \ac{CUDA} executables from LLVM \ac{IR}, yet similar breakthroughs for the \ac{OpenCL} platform are lacking.
+\end{itemize}
+
+\paragraph*{Moving away from MapReduce}
+There are clear benefits of utilising familiar languages for orchestrating parallel tasks, such as significant increases in usability.
+Yet, it is currently infeasible to translate the entirety of stated programs.
+With this in mind, the decision was made  to lower the scope of direction, with the user stating only parallel subroutines and having \ac{OpenCL} dispatch of said subroutines automated.
+
+At the close of the first year, a prototype system was produced that allowed a user to perform \verb|map| and \verb|filter| tasks.
+Specification of tasks was provided by a string of C expressions that would be interpolated into stock kernels.
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:project_prototype,
+  caption=Example of prototype system workflow.
+]
+DataSet.create(
+  name: :one_to_ten,
+  type: :int,
+  data: (1..10).to_a
+)
+
+FP::Map.create(
+  name: :add_one,
+  key: [:int, :i],
+  function: 'i += 1;'
+)
+
+FP::Filter.create(
+  name: :add_three_is_even,
+  key: [:int, :i],
+  function: 'i += 3;',
+  test: 'i % 2 == 0'
+)
+
+DEVICE = OCLDevice::CPU.get
+
+DEVICE
+  .load(:one_to_ten)
+  .fp_map(:add_one).fp_filter(:add_three_is_even)
+  .output
+\end{lstlisting}
+This proof-of-concept demonstrated that performance gains were achievable by performing computation outside the confines of the \ac{RubyVM}.
+
+However, evaluation of the prototype highlighted several flaws:
+\begin{itemize}
+    \item Using the library was incredibly verbose. Creating named objects to represent each state of computation meant that a line of pure Ruby code could spawn tens of lines of library code when converted to parallel execution.
+
+    \item Lots of redundant parameters were required by the system. There is no reason for a \verb|map| task to specify it's input parameter type when the syntax can be checked by a compiler. The separate declaration and usage of element variables increased the potential for bugs, in addition to exposing implementation details to the user.
+
+    \item A lack of task optimisation caused higher-than-necessary workloads. Two consecutive \verb|map| tasks would require two passes over the data instead of just one, as the intermediate result was produced.
+
+    \item Code quality was poor. This was mainly due to the combination of venturing into a previously unexperienced programming paradigm, and organic growth of functionality during rapid prototyping.
+
+    A prototype with successful functionality is used to discover the requirements of a system. It is then much easier to redesign a new system, one that is much more elegant yet achieves the same results.
+\end{itemize}
+
+\paragraph*{Learning from mistakes}
+The system redesign at the start of the second year specifically targeted previously identified flaws:
+\begin{itemize}
+    \item First-class function support allows the library's usage to mirror standard higher-order function usage. Since anonymous function are used, this removes the verbosity of many named objects requiring creation.
+
+    \item Some parameters are no-longer required, or inferred, due to a change in internal design. For example, anonymous functions document the input parameter throughout the calculation, so specifying this separately is unnecessary.
+
+      Another example is subroutine type information. The computation pipeline can now keep track of the buffer type at a given point in execution and use this to guide kernel creation, instead of requiring user-submitted type definition.
+
+    \item By deferring and combining tasks, as documented in the \emph{Design} chapter, unnecessary computation can be avoided.
+
+    \item A redesigned architecture, alongside focusing on testing and ease-of-modification. This helps maintain the software quality of the replacement system, even as requirements shift.
+\end{itemize}
 
 \subsection{Difficulties}
+Several unforeseen issues have slowed down progress in certain stages of the project's progression.
 
-\subsection{Successes}
+\paragraph*{Initial development system}
+The target \ac{GPGPU} test-bed was originally a desktop system containing a NVIDIA \emph{GTX 670} \ac{GPU}. It also contained an Intel \emph{Haswell} \ac{APU}. Unfortunately, it became clear during the process of porting the codebase, initially developed solely on a MacBook, that the state of the required libraries was much worse than advertised.
+
+Had the libraries for the system been available, the produced framework would allow task scheduling on either compute device within the \ac{APU}, or the \ac{GPGPU}.
+
+The difficulties encountered were as follows:
+\begin{itemize}
+  \item Intel's \ac{OpenCL} implementation only allows access to the graphics-processing \ac{APU} co-processor under two conditions: If the operating system is Windows 7/8, or if the device is a Xeon processor. Xeon devices are not present in affordable desktop systems. The owned test-system did not support the required socket-style.
+
+  \item Development in Windows was not possible due to the need to build several system components. The latest Ruby language snapshot and the extension modules necessary for the library to operate must be built, from source, during development. This process is still bug-ridden on non-*NIX systems.
+\end{itemize}
+
+Following these setbacks, the goal of utilising the \ac{APU}'s graphic subsystem in addition to the \ac{CPU} was abandoned. \emph{GNU/Linux} was installed on the desktop system. However, the situation was further hindered when it became clear that the capabilities of NVIDIA's \ac{OpenCL} implementation were vastly overstated. With no support for \ac{OpenCL} $1.2$ and suboptimal performance on $1.1$m the high-end \ac{GPU} present would not provide as much of a performance boost as initially anticipated.
+
+\paragraph*{Replacement system}
+In order to continue the project's goal of properly exploring the potential benefits of \ac{GPGPU} programming, the decision was made to purchase an `idea' hardware platform to continue development on.
+
+The system, consisting of an \ac{AMD} \emph{FX-4130} CPU and an \ac{AMD} \emph{R7 260X} \ac{GPGPU}, was ordered and assembled after the initial problems were encountered. This caused a slight stall in development. However, it was estimated that with hardware utilising a single, \ac{AMD} \ac{OpenCL} implementation, productivity would be vastly increased. In fact, this was the case, enough so to make the delay worth experiencing.`
 
 \section{Completed Work}
 \subsection{Features}
-
+\todo{Complete overview of what was done, brief but inclusive.}
