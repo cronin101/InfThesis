@@ -37,7 +37,7 @@ The dependency graph for a \verb|map| of $\|A\| = 6$ is shown in Figure~\ref{fig
   \end{center}
 \end{figure}
 
-When analysing data-dependency graphs, such as the one above, any partitioning that doesn't sever edges denotes a valid parallel strategy. Since Figure~\ref{fig:mapgraph} contains no inter-node dependencies, it is trivial to schedule the task concurrently on many compute units.
+When analysing data-dependency graphs, such as the one above, any partitioning that doesn't sever edges denotes a valid parallel strategy. Since Figure~\ref{fig:mapgraph} contains no inter-node dependencies, it is trivial to schedule the task concurrently on many compute units. The \verb|map| task is \emph{embarrassingly parallel}.
 
 \algblockdefx[Pf]{PFor}{EndPFor}{\textbf{in parallel, for} }{\textbf{end parallel for}}
 \begin{algorithm}
@@ -302,6 +302,102 @@ This suggests that \verb|scatter|, when using unique indices, is \emph{embarassi
 The kernel design is simpler than that of \verb|map|, since function side-effects do not need to be included. It is presented in Algorithm~\ref{alg:scatterkernel}.
 
 \subsection{Filter}
+\verb|filter| is a higher-order function that applies a predicate function on elements of a dataset. It returns the subset of the input vector for which the predicate evaluates true. 
+
+A sequential implementation of the primitive is shown in Algorithm~\ref{alg:seqfilter}.
+
+\begin{algorithm}
+  \caption{\emph{Filter} higher-order function with sequential execution.}
+  \label{alg:seqfilter}
+
+  \begin{algorithmic}
+    \Function{SeqFilter}{$A, predicate$}
+      \State{$Result \Leftarrow$ \verb|[ ]|}
+      \ForAll{$a_i \in A$}
+      \If{\Call{$predicate$}{$a_i$}}
+      \State{\Call{Push}{$Result, a_i$}}
+      \EndIf
+      \EndFor
+      \State{$A \Leftarrow Result$}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Checking the predicate is simple to do in parallel, since whether to keep each element depends only on the value of that element. However, producing and returning the subset is slightly more involved. The complication stems from the position of each kept item in the output array depending on the state of previous elements in the input vector.
+
+\begin{figure}[h]
+  \caption{\emph{Filter} dependency graph.}
+  \label{fig:filtergraph}
+  \begin{center}
+    \begin{tikzpicture}
+      [scale=.8,auto=left,every node/.style={circle}]
+
+      \foreach \x in {1, 2, 3, 4, 5}{
+        \node (a\x) at (2 * \x, 3) {$a_{\x}$};
+      }
+
+      \foreach \x/\y in {1/1, 4/2, 5/3}{
+        \node (b\x) at (2 * \x, 0) {$a^\prime_{\y}$};
+      }
+
+      \draw[->] (b1) -- (a1);
+
+      \draw[->] (b4) -- (a1);
+      \draw[->] (b4) -- (a2);
+      \draw[->] (b4) -- (a3);
+      \draw[->] (b4) -- (a4);
+
+
+      \draw[->] (b5) -- (a1);
+      \draw[->] (b5) -- (a2);
+      \draw[->] (b5) -- (a3);
+      \draw[->] (b5) -- (a4);
+      \draw[->] (b5) -- (a5);
+    \end{tikzpicture}
+  \end{center}
+\end{figure}
+
+The \verb|filter| operation is clearly not \emph{embarrassingly parallel}. However, there is no need to search for an involved parallel algorithm. We can construct an efficient \verb|filter| operation by reusing the previously defined parallel primitives.
+
+\paragraph*{Composing a parallel solution}
+The first stage of producing a parallel \verb|filter| primitive is recognising the distinct data dependencies:
+\begin{enumerate}
+  \item Whether an element is kept.
+  \item Where any kept element appears in the result.
+  \item The total number of elements kept, since we cannot dynamically allocate memory.
+\end{enumerate}
+
+\subparagraph*{Identifying kept elements}
+The information required by dependency $1$ can be obtained by performing a \verb|map| task on the dataset using the predicate function. The sole difference is that the result should be stored in a new buffer instead of overwriting the previous value.
+
+Assuming we have an input vector $A$ and a newly created predicate buffer $P$, we now know that any $A_i$ should be kept if, and only if, $P_i$.
+
+\subparagraph*{Knowing where to place kept elements}
+Once we have produced a predicate buffer, via $1$, we can easily derive the destination of kept elements ($2$). If the predicate buffer is stored as a vector of bit-flags, the number of kept elements at point $P_i$ is equal to element $i$ of the prefix-summation of $P$. This connection is illustrated in Figure~\ref{fig:wheretoplace}
+
+\begin{figure}[h]
+\begin{center}
+  \caption{Using prefix-sum to determine insertion points.}
+  \label{fig:wheretoplace}
+
+  $predicate$ = \verb|keep_if_even|
+  \vskip 10pt
+  \begin{tabular}{ | c | c | c | c | c | c |}
+    \hline
+    Input dataset   & 0 & 1 & 2 & 3 & 4 \\ \hline
+    Presence buffer & 1 & 0 & 1 & 0 & 1 \\ \hline
+    Prefix sum      & 1 & 1 & 2 & 2 & 3 \\ \hline
+    Insertion point & 0 & - & 1 & - & 2 \\ \hline
+  \end{tabular}
+\end{center}
+\end{figure}
+
+The translation from prefix-summed buffer element to insertion point is just an off-by-one adjustment.
+Furthermore, since \verb|map| followed by \verb|scan| is cost $O(n) + O(n) = O(n)$, we can obtain these insertion points \emph{cost-optimally}.
+
+\subparagraph*{Counting the number of kept elements}
+Following the calculation of dependencies $1$ and $2$, obtaining $3$ is trivial. It is simply the final element of the prefix-sum buffer. This can be retrieved by a single lookup after the other sub-problems have been solved.
+
 \todo{Explain how this just uses the previous operators}
 
 \subsection{Sort}
