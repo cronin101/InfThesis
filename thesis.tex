@@ -8,6 +8,7 @@
 \input{./acronyms.tex}
 
 \begin{document}
+\pagenumbering{gobble}
 \input{./doc_details.tex}
 \abstract{\input{./abstract.tex}}
 \maketitle
@@ -15,6 +16,8 @@
 \tableofcontents
 \listoftodos
 
+\newpage
+\pagenumbering{arabic}
 \input{./introduction.tex}
 
 \input{./project_overview.tex}
@@ -29,6 +32,7 @@
 
 \input{./conclusions.tex}
 
+\pagenumbering{gobble}
 \bibliography{thesis}{}
 \bibliographystyle{unsrt}
 

@@ -205,6 +205,9 @@ Importantly, it is \emph{cost-optimal}, meaning that its cost is equal to that o
 
 This discovery suggests that it is possible to increase the throughput of \verb|scan| tasks significantly, by scheduling them across massively parallel \ac{OpenCL} devices.
 
+\paragraph*{\ac{OpenCL} kernel design}
+\todo{Mention differing algorithm, code provided by Apple SDK.}
+
 \subsection{Scatter}
 The \verb|Scatter| primitives receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
 
@@ -223,7 +226,7 @@ The \verb|Scatter| primitives receives an input array $A$, an array of indices $
   \end{algorithmic}
 \end{algorithm}
 
-\paragraph*{Two types of scatter}
+\paragraph*{Permutation scatter}
 It is important to draw attention to an important distinction in types of \verb|scatter| operation. \emph{Permutation Scatter} is defined as a scatter operation where all $i \in I$ are unique. Therefore, there are no two writes to the same destination in $B$. Other forms of \verb|scatter| increase complexity, as rules that state how to handle write collisions within the transaction must be introduced.
 
 Luckily, for this project's needs we only need to analyse the simpler \emph{permutation scatter}. We can assume that no two writes to the same destination offset will occur.
@@ -284,8 +287,21 @@ This suggests that \verb|scatter|, when using unique indices, is \emph{embarassi
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
-\subsection{Filter}
+\paragraph*{Equivalent \ac{OpenCL} kernel design}
+\begin{algorithm}
+  \caption{\emph{Permutation Scatter} primitive in \ac{OpenCL} kernel form.}
+  \label{alg:scatterkernel}
+  \begin{algorithmic}
+    \Function{ScatterKernel}{$A, I, B$}
+      \State{$i \Leftarrow$ \Call{GetGlobalID}{}}
+      \State{$B_{I_i} \Leftarrow A_i$}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 
+The kernel design is simpler than that of \verb|map|, since function side-effects do not need to be included. It is presented in Algorithm~\ref{alg:scatterkernel}.
+
+\subsection{Filter}
 \todo{Explain how this just uses the previous operators}
 
 \subsection{Sort}
