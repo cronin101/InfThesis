@@ -56,6 +56,9 @@ Instructions of interest are extracted from the human-readable string. This is a
 The instructions are then tokenised, by the process detailed in Listing~\ref{lst:tokeniser_rules}.
 The end result is a list of tokens representing stack-machine instructions, in \ac{RPN}.
 
+The heavy reliance on regular expressions to parse bytecode is inelegant and fragile.
+However, with access only to a human-readable string, and a lack of any formal grammar, it was the best tool at hand to get the job done.
+
 \begin{lstlisting}[
   language=Ruby,
   label=lst:tokeniser_rules,
@@ -118,3 +121,30 @@ end
 
 \paragraph*{Expression reconstruction}
 The final stage of the conversion pipeline. It requires converting \ac{RPN} to infix form.
+Luckily, this part is less crazy. There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
+
+\begin{algorithm}
+  \caption{\ac{RPN} to infix expression conversion.}
+  \label{alg:to_infix}
+
+  \begin{algorithmic}
+    \Function{RpnToInfix}{$tokens$}
+    \State{$Stack \Leftarrow$ \verb|[ ]|}
+    \While{\Call{length}{$tokens$} $ > 0$}
+    \State{$token \Leftarrow $\Call{shift}{$tokens$}}
+    \If{\Call{isLiteral}{$token$}}
+    \State{\Call{push}{$Stack, token$}}
+    \Else
+    \State{$right \Leftarrow $\Call{pop}{$Stack$}}
+    \State{$left \Leftarrow $\Call{pop}{$Stack$}}
+    \State{$combined \Leftarrow $\Call{combine}{$token, left, right$}}
+    \State{\Call{push}{$Stack, combined$}}
+    \EndIf
+    \EndWhile
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all the mathematical operators required. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
+
+\subsection{Task queue}
