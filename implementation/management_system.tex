@@ -1,0 +1,120 @@
+\section{Management System}
+
+\subsection{Function parser}
+The system's function parser is responsible for converting a supplied anonymous function into C syntax. The functionality of the parser is demonstrated in Listing~\ref{lst:parser_ex}
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:parser_ex,
+  caption=The \emph{LambdaBytecodeParser} converts an anonymous function Ruby object into an array of C expressions.
+]
+foo = 3
+a_function = ->(x){ foo * (2 + x) }
+#=> #<Proc:0x007f976207ff48@(pry):12 (lambda)>
+
+parser = RubiCL::LambdaBytecodeParser.new(a_function)
+#=> #<struct RubiCL::LambdaBytecodeParser
+#   function=#<Proc:0x007f9761c362c0@(pry):15 (lambda)>>
+
+parser.bytecode
+#=> " == disasm: <RubyVM::InstructionSequence:block in __pry__
+# == catch table
+# | catch type: redo   st: 0000 ed: 0016 sp: 0000 cont: 0000
+# | catch type: next   st: 0000 ed: 0016 sp: 0000 cont: 0016
+# |-----------------------------------------------------------
+# local table (size: 2, argc: 1 [opts: 0, rest: -1, post: 0,
+#                                  block: -1, keyword: 0@3] s3)
+#   [ 2] x<Arg>     
+#   0000 trace            256                            (  22)
+#   0002 trace            1
+#   0004 getlocal         foo, 2
+#   0007 trace            1
+#   0009 putobject        2
+#   0011 getlocal_OP__WC__0 2
+#   0013 opt_plus         <callinfo!mid:+, argc:1, ARGS_SKIP>
+#   0015 opt_mult         <callinfo!mid:*, argc:1, ARGS_SKIP>
+#   0017 trace            512
+#   0019 leave"
+parser.parsed_operations
+#=> [3, 2, "x", "+", "*"]
+
+parser.to_infix
+#=> ["3 * (2 + x)"]
+\end{lstlisting}
+
+The conversion process occurs over three stages: dumping bytecode, lexing, and reconstruction.
+
+\paragraph*{Obtaining function bytecode}
+The bytecode instructions produced by a compiled anonymous function object is provided by the \verb|RubyVM::InstructionSequence| module's \verb|disassemble| method.
+It returns a human readable string that includes all stack-machine instructions.
+
+\paragraph*{Lexing bytecode string}
+Instructions of interest are extracted from the human-readable string. This is achieved via a regular expression containing a whitelist of keywords:
+\begin{verbatim}
+/(?:\d*\s*(?:(getlocal.*|putobject.*|opt_.*).?))/
+\end{verbatim}
+
+The instructions are then tokenised, by the process detailed in Listing~\ref{lst:tokeniser_rules}.
+The end result is a list of tokens representing stack-machine instructions, in \ac{RPN}.
+
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:tokeniser_rules,
+  caption=Tokenisation rules for lexing human-readable bytecode.
+]
+def translate(operation)
+  case operation
+  # First function argument
+  when /getlocal_OP__WC__0 #{function.arity + 1}/
+    'x'
+
+  # Second function argument
+  when /getlocal_OP__WC__0 #{function.arity}/
+    'y'
+
+  # Indexed bound variable
+  when /getlocal_OP__WC__1 \d+/
+    id = /WC__1 (?<i>\d+)/.match(operation)[:i].to_i
+    index = locals_table.length - (id - 1)
+    beta_reduction locals_table[index]
+
+  # Named bound variable
+  when /getlocal\s+\w+,\s\d+/
+    name = /getlocal\s+(?<name>\w+),/.match(operation)[:name].to_sym
+    beta_reduction name
+
+  # Literal Zero
+  when /putobject_OP_INT2FIX_O_0_C_/
+    0
+
+  # Literal One
+  when /putobject_OP_INT2FIX_O_1_C_/
+    1
+
+  # Floating-Point Literal
+  when /putobject\s+-?\d+\.\d+/
+    operation.split(' ').last.to_f
+
+  # Integer Literal
+  when /putobject\s+-?\d+/
+    operation.split(' ').last.to_i
+
+  # Method Sending
+  when /opt_send_simple/
+    /mid:(?<method>.*?),/.match(operation)[:method].to_sym
+
+  # Built-in Operator
+  when /opt_/
+    LOOKUP_TABLE.fetch operation[/opt_\w+/].to_sym
+  else
+    raise "Could not parse: #{operation} in #{bytecode}"
+  end
+end
+
+def beta_reduction variable_name
+  function.binding.local_variable_get variable_name
+end
+
+\end{lstlisting}
+
+\paragraph*{Expression reconstruction}
+The final stage of the conversion pipeline. It requires converting \ac{RPN} to infix form.
