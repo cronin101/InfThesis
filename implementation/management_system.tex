@@ -116,14 +116,11 @@ end
 def beta_reduction variable_name
   function.binding.local_variable_get variable_name
 end
-
 \end{lstlisting}
 
 \paragraph*{Expression reconstruction}
-The final stage of the conversion pipeline. It requires converting \ac{RPN} to infix form.
-Luckily, this part is less crazy. There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
 
-\begin{algorithm}
+\begin{algorithm}[h]
   \caption{\ac{RPN} to infix expression conversion.}
   \label{alg:to_infix}
 
@@ -145,6 +142,69 @@ Luckily, this part is less crazy. There is a well-defined algorithm for doing so
   \end{algorithmic}
 \end{algorithm}
 
+The final stage of the conversion pipeline. It requires converting \ac{RPN} to infix form.
+Luckily, this part is less crazy. There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
+
 The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all the mathematical operators required. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
 
 \subsection{Task queue}
+The \verb|TaskQueue| management system buffers all deferred tasks, scheduled during the computation pipeline. It is responsible for detecting potential optimisations and applying them prior to dispatch.
+By fusing compatible tasks, the number of passes over the data required can be reduced. The rules utilised to select and process tasks eligible for fusion are detailed in Listing~\ref{lst:fusion_rules}.
+
+In the order presented, the types of fusion supported are as follows:
+\begin{description}
+\item[Map-map fusion] Adjacent \verb|map| tasks can be replaced by a single task that performs the side-effects of both tasks combined.
+
+\item[Filter-filter fusion] Adjacent \verb|filter| tasks can be replaced by a single task that only retains elements that pass both predicates.
+
+\item[Map-filter fusion] A \verb|filter| task following a \verb|map| task can replace it, performing its mutation before generating presence flags. Filter tasks that have gained the additional responsibility to mutate are hereafter referred to as \verb|mapfilter| tasks.
+
+\item[Filter-map fusion] Similarly, a \verb|map| task following a \verb|filter| task should not necessarily be scheduled. The side-effects of the \verb|map| can be performed after filtering by a fused \verb|mapfilter| kernel. This has the disadvantage that branching in the following map task, to avoid unnecessary calculation on items that won't be kept, will cause inefficient stalling in execution. However, if enough work-units are scheduled, the \ac{OpenCL} runtime can identify non-stalled units to swap-in. Nonetheless, time wasted by stalls in a fused kernel is insignificant compared to the time to schedule a new kernel and pass over the data again in a separate \verb|map| task.
+
+\item[Map-mapfilter fusion] No different to \verb|map-filter| fusion. The side-effects of the replaced \verb|map| task are prepended to the \verb|mapfilter|'s preprocessing actions.
+
+\item[Mapfilter-map fusion] Again, advantageous as it avoids scheduling another pass over the data. The side-effects of the unnecessary are appended to the \verb|mapfilter|'s post-processing actions.
+
+\item[Mapfilter-filter fusion] In \verb|mapfilter| tasks that have no post-processing actions, the \verb|filter| segment can be updated in the same manner as \verb|filter-filter| fusion.
+\end{description}
+
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:fusion_rules,
+  caption=Fusion rules for combining tasks within the \emph{TaskQueue}.
+]
+@tasks = @tasks.reduce [] do |queue, task|
+  if (*fixed_queue, previous = queue).empty? then [task]
+  else
+    case [previous.class, task.class]
+    when ([RubiCL::Map] * 2), ([RubiCL::Filter] * 2)
+      fixed_queue << previous.fuse!(task)
+
+    when [RubiCL::Map, RubiCL::Filter]
+      fixed_queue << RubiCL::MappingFilter.new(
+          pre_map: previous, filter: task)
+
+    when [RubiCL::Filter, RubiCL::Map]
+      fixed_queue << RubiCL::MappingFilter.new(
+          filter: previous, post_map: task)
+
+    when [RubiCL::Map, RubiCL::MappingFilter]
+      fixed_queue << task.pre_fuse!(previous)
+
+    when [RubiCL::MappingFilter, RubiCL::Map]
+      fixed_queue << previous.post_fuse!(task)
+
+    when [RubiCL::MappingFilter, RubiCL::Filter]
+      if previous.has_post_map?
+        fixed_queue << previous << task
+      else
+        fixed_queue << previous.filter_fuse!(task)
+      end
+    else
+      fixed_queue << previous << task
+    end
+  end
+end
+\end{lstlisting}
+
+Options to turn-off \verb|TaskQueue| optimisation were introduced so that the magnitude of benefits can be studied. This will be revisited in the \emph{Evaluation} chapter.

@@ -1,0 +1,109 @@
+\section{Performance testing}
+A stated goal of the project refers to ``improving dynamic language performance''.
+Therefore, it is important that the project provides a method for producing meaningful metrics.
+In order to facilitate measurement, a benchmarking suite for easy graph creation was developed.
+In addition, an execution mode that displays timing information alongside results was added to the \verb|Logger|.
+
+\subsection{Custom benchmarking environment}
+During the lifetime of the project, a benchmarking library was created. It was originally designed as personal project, but was utilised heavily during development of the library.  The benchmark library eases the production of graphs that plot function runtime over a range of input sizes.
+
+A user provides several parameters to the library:
+\begin{itemize}
+\item A name for the graph.
+\item The number of iterations to average benchmark results over.
+\item Several function descriptions to test.
+\end{itemize}
+
+Each function description also contains parameters:
+\begin{itemize}
+\item A description of what is being benchmarked.
+\item An \verb|Enumerable| providing seeds to the benchmark environment.
+\item A function that turns each seed into a \emph{input}. This could be any value, given to the benchmarked function, that responds to \verb|size|.
+\item The function to benchmark.
+\end{itemize}
+
+The benchmarking environment was used to produce Figure~\ref{fig:ruby_vs_c}, shown earlier in the \emph{Overview} chapter. The code used to generate the graph is shown in Listing~\ref{lst:vs_c_graph}.
+
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:vs_c_graph,
+  caption=The \emph{asymptotic} library used to generate quick benchmark graphs.
+]
+require 'asymptotic'
+require 'ostruct'
+
+seeds = (20..25)
+
+ruby_input = {
+  input_seeds: seeds,
+  input_function: ->(seed){ (1..2**seed).to_a }
+}
+
+command_line_input = {
+  input_seeds: seeds,
+  input_function: ->(seed){
+    OpenStruct.new.tap { |s| s.size = 2**seed }
+  }
+}
+
+Asymptotic::Graph.plot(5, "squaring integers and filtering evens",
+  "Ruby: Enumerable#map and Enumerable#filter" => {
+    function: ->(array){
+      array.map { |x| x * x }.select { |x| x % 2 == 0 } 
+    },
+  }.merge(ruby_input),
+
+  "C: loop for mapping followed by loop for filtering" => {
+    function: ->(struct){ `./just_c.o #{struct.size}` },
+  }.merge(command_line_input),
+)
+\end{lstlisting}
+
+The library handles generating an average runtime, using the specified number of test iterations, for each $(function, \|input\|)$ pair.
+The garbage collector is turned off for the duration of each test and manual sweeping is triggered after each measurement is taken.
+A graph is then produced, using the \verb|gnuplot| library, that compares the performance of all provided functions.
+
+The ability to effortlessly create runtime graphs, for arbitrary given functions, proved useful during experimental development.
+When changes were introduced into the codebase, corresponding feature flags were added to the configuration module.
+Then, the benchmark environment was be used to plot the performance of the feature turned off against the performance with the feature enabled.
+This made it easy to highlight changes in design that altered performance for a given task over a variety of input sizes.
+
+\subsection{Segmented timing information from execution environment}
+Overall execution time is an important metric. However, it is helpful to be able to tell what proportion of time is spend doing various tasks during runtime.
+
+In order to achieve this, code that gathers timing information was introduced to the library's native extensions that interact with hardware devices.
+
+With each action triggered by the system, the resultant transaction time was measured.
+The low-level code, handling device management, obtained measurements via observing the start and stop time of \ac{OpenCL} library functions.
+This data could then be retrieved by the library and inspected to determine the duration of subtasks, transferring or processing data.
+
+Execution duration measurements are taken by native interaction modules, and observed by the management system.
+To make these readings available, configuration flags were added to the \verb|Logger| stating that this data should be displayed during runtime.
+
+An example of the finer granularity timing information presented is given in Listing~\ref{lst:segment_times}.
+\begin{lstlisting}[
+  language=Ruby,
+  label=lst:segment_times,
+  caption=Segment times presented during command execution.
+]
+RubiCL::Logger.show_timing_info = true
+#=> true
+
+(1..10)[Int].map { |x| x + 100 }.filter { |y| y.even? }[Fixnum]
+#> Pipeline Started
+#> Pinned Integer Range in 0.039 ms
+#> Enqueued
+#>  (rubiclmappingfilter5 =>
+#>    [
+#>      "x = x >> 1", "x = x + 100",
+#>      "?{(x % 2 == 0)}?", "x = (x << 1) | 0x01"
+#>     ]
+#>  )
+#> in 3.175 ms
+#> Waiting for in-progress tasks took 0.004 ms
+#> Retrieved 5 Integers in 0.017 ms
+#> Pipeline Complete in 5.109 ms
+#=> [102, 104, 106, 108, 110]
+
+\end{lstlisting}
+
