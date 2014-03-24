@@ -1,5 +1,5 @@
 \subsection{Improving the performance of dynamic languages when executing data-driven tasks}
-Dynamic, interpreted languages are commonly celebrated for their increased expressiveness over static, compiled languages. Often, they greatly reduce the amount of code that is necessary to perform common tasks. However, they continue to be overshadowed by optimised compilation of static languages, particularly for performance-intensive procedures. A typical performance divergence is shown in Figure~\ref{fig:ruby_vs_c}.
+Dynamic, interpreted languages are commonly celebrated for their increased succinctness over static, compiled languages. Often, they greatly reduce the amount of code that is necessary to perform common tasks. However, they continue to be overshadowed by the optimised compilation of static languages, particularly for performance-intensive procedures. A typical performance divergence is shown in Figure~\ref{fig:ruby_vs_c}.
 
 \begin{figure}[h]
   \includegraphics[width=0.8\textwidth]{./figures/ruby_vs_c.png}
@@ -37,7 +37,7 @@ dataset_2.mean
 #=> 23.2
 \end{lstlisting}
 
-By widening the scope of problems that can be evaluated within a \ac{REPL}. RubiCL shall enable investigation into trends, unavailable available to novice users previously due to the scale of input data.
+By widening the scope of problems that can be evaluated within a \ac{REPL}, RubiCL shall enable a larger scale of investigation. Analysis of particularly large datasets is currently unavailable to novice users, due to the amount computation required.
 
 \paragraph*{Indicators of success}
 The completely library should be presented to novice analysts, users with mathematical insight but insignificant programming prowess. If they are able to easily answer queries about large datasets, the system's design will be judged as successful. As with the previous goal's evaluation, response time with in a \ac{REPL} environment will be examined.
@@ -73,7 +73,7 @@ The integration will be successful if the interface for processing data remains 
 
 Without techniques for reuse, advances made by one parallel project may not be applicable to others. Programmers writing parallel systems must implement all subtasks from the bottom up when constructing the full solution. As it is hard to incorporate the partial solutions of others, barriers to entry are further increased.
 
-The project undertaken will attempt to recycle the partial solutions of primitives as much as possible. This allows investigate into how much reuse is possible, given an ideal system with a single author.
+The project undertaken will attempt to recycle the partial solutions of primitives as much as possible. This allows investigation into how much reuse is possible, given an ideal system with a single author.
 
 With code reuse, optimisations of a given subtask will improve all primitives utilising the component. This directs experimentation when searching for performance improvements.
 

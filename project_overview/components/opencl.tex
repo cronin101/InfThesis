@@ -3,14 +3,15 @@ The project requires interaction with heterogeneous processing devices present w
 It achieves this via the hardware vendor's implementation of the \ac{OpenCL} library.
 
 \ac{OpenCL} is an open framework for executing tasks, described by C99-syntax \emph{kernels}, on a variety of devices.
-Suitable targets include a range of heterogeneous devices such as multi-core \acp{CPU}, \acp{APU}, and \ac{GPU} from the majority of commodity hardware vendors.
+Suitable targets include a range of devices, such as multi-core \acp{CPU}, \acp{APU}, and \ac{GPU} from the majority of commodity hardware vendors.
 
 The Khronos Group maintains and frequently updates the \ac{OpenCL} standard\cite{khronos}.
-Participating vendors include \ac{AMD}, Apple, Intel, and NVIDIA \textemdash{} although the quality and accessibility of implementations varies greatly.
+Participating vendors include \ac{AMD}, Apple, Intel, and NVIDIA.
+However, the quality and accessibility of implementations varies greatly.
 
 A stated goal of the \ac{OpenCL} project is to ``allow cross-platform parallel programming''.
 The underlying processing devices present on a system are abstracted, allowing code to be written without explicit knowledge of target architectures.
-This theoretically enables developers to write applications for a person system and then later scale execution to a massively parallel workstation, without significant code modification.
+This theoretically enables developers to write applications for a personal system and then later scale execution to a massively parallel workstation, without significant code modification.
 
 \begin{figure}[h]
 \begin{center}
@@ -43,19 +44,19 @@ Kernel execution occurs across internal \emph{processing units}, such as \acp{AL
 
 Kernel instances, scheduled for execution on compute devices, as referred to as \emph{work-items}.
 
-The \ac{OpenCL} standard calls a collection of work-items a \emph{work-group}. Work-groups are the unit of work dispatched to a device. The number of work-items within a group that a device should schedule is set by the programmer, providing the \verb|global_work_size| parameter. Each kernel invocation is enumerated with a global \verb|id|. 
+The \ac{OpenCL} standard calls a collection of work-items a \emph{work-group}. Work-groups are the unit of work dispatched to a device. The number of work-items within a group is set by the programmer, providing the \verb|global_work_size| parameter. Each kernel invocation is enumerated with a global \verb|id|. 
 
 In addition to flat enumeration, the computation can benefit from the abstraction of work \emph{dimensions}. For example, a calculation over $100$ elements can represented as a 2-dimensional $10 \times 10$ calculation. When utilising dimensional abstraction, access to either unique global \verb|id| or $x, y$ offsets is available.
 
-Higher dimensions are available for further structuring of tasks. It is clear that the spatial abstraction provided when there is a topological significant within the processed data. In these circumstances, the \verb|local_work_size| parameter provides further benefits.
+Higher dimensions are available for further structuring of tasks. The spatial abstraction provided is particularly useful when there is topological significance to the processed data. In these circumstances, the \verb|local_work_size| parameter provides further benefits.
 
 When \verb|local_work_size| is specified, again possibly with dimensionality, the work-items are additionally divided into subgroups. Memory allocation can use the \verb|__local| qualifier. In this case, data will reside in higher-bandwidth buffers that can only be synchronised between members of the same local work-group. With the addition of this second, local tier of memory, the \ac{OpenCL} model hints at how efficient kernels should be constructed. Being aware of the positioning of data and its dependencies is key to developing efficient kernels, free of memory-synchronisation bottlenecks.
 
 Much of the project's implementation effort concerning \ac{OpenCL} will be mapping data required by common algorithms to efficient arrangements within device memory. This mirrors \ac{OpenCL} development in general.
-The fact that this task is so laborious is a reason why heterogeneous parallel programming is still under-utilised in the wild.
+The fact that this task is so laborious is a reason why heterogeneous parallel programming on the \ac{OpenCL} platform is still under-utilised in the wild.
 
 \paragraph*{Comparison with CUDA}
-\ac{OpenCL} is not the only computation framework choice when interacting with \ac{GPGPU} devices. As mentioned earlier, a competing technology is NVIDIA's \ac{CUDA}.
+\ac{OpenCL} is not the only available computation framework for interacting with \ac{GPGPU} devices. As mentioned earlier, a competing technology is NVIDIA's \ac{CUDA}.
 
 During the planning phase, RubiCL considered both choices. Ultimately, the decision was made to use \ac{OpenCL} over \ac{CUDA} for several major reasons:
 
@@ -74,12 +75,12 @@ During the planning phase, RubiCL considered both choices. Ultimately, the decis
   There are several downsides to using \ac{OpenCL} instead of \ac{CUDA}. The programming model is generally agreed to be less developer friendly. This is perhaps due to the need to include far more abstraction over the range of target devices. In addition, due to the need for compatibility with several device families, \ac{OpenCL} can be less performant out-of-the-box than \ac{CUDA}. Advanced knowledge of how to tweak device-specific parameters to avoid execution bottlenecks can help avoid this.
 
   \paragraph*{Current state of OpenCL implementations}
-  A final major disadvantage of \ac{OpenCL} at the moment, is the current quality of some vendor implementations. All vendors advertise themselves as being \ac{OpenCL}-compatible when marketing their hardware. However, in reality it is harder than advertised to achieve a working system.
+  A final major disadvantage of \ac{OpenCL} at the moment, is the current quality of some vendor implementations. All vendors advertise themselves as being \ac{OpenCL}-compatible when marketing their hardware. However, in reality it is often harder than advertised to achieve a working system.
 
-  For example, NVIDIA, have made no attempt to hide the fact that they would much rather everybody used \ac{CUDA} instead. They are so slow at releasing libraries that they are a full version of the \ac{OpenCL} specification behind other vendors at the time of writing this report. Features that are supported also perform much worse than expected.
+  For example, NVIDIA have made no attempt to hide the fact that they would much rather everybody used \ac{CUDA} instead. They are sufficiently slow enough at releasing libraries as to be a full version of the \ac{OpenCL} specification behind other vendors, at the time of writing this report. Features that are supported also perform much worse than expected.
 
-  Intel are up-to-date with library implementations but only have non-Windows support if you have purchased non-consumer grade \emph{Xeon} processors.
+  Intel are up-to-date with library implementations but only have full non-Windows support if you have purchased non-consumer grade \emph{Xeon} processors.
 
-  Hopefully these issues will be rectified if \ac{OpenCL} continues to gain tracking in future. As a short term response, the RubyCL project has been implemented on well-supported hardware only: An Apple Macbook Air containing a Intel Haswell processor, and a desktop system containing an \ac{AMD} \ac{CPU} and \ac{GPU}.
+  Hopefully these issues will be rectified if \ac{OpenCL} continues to gain traction in future. As a short term response, the RubiCL project has been implemented on well-supported hardware only: An Apple Macbook Air containing a Intel Haswell processor, and a desktop system containing an \ac{AMD} \ac{CPU} and \ac{GPU}.
 
   Apple and \ac{AMD} both have high-quality \ac{OpenCL} $1.2$ libraries and seem to be the two companies most invested in increased \ac{OpenCL} uptake. Apple have recently started encouraging desktop software developer to schedule suitable tasks on the \ac{GPU} via OS X's \ac{GCD}.

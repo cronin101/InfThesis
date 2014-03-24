@@ -10,14 +10,14 @@ The often-cited ``Moore's Law''~\cite{moores_law} suggested that our favourite a
 \end{figure}
 
 The stark truth is that this trend now seems to have lapsed (Figure~\ref{fig:free_lunch_over}).
-The latest generation of \acp{CPU} offer no significant clock-speed increases over the previous. Furthermore, improvements in per-clock performance are lacklustre.
+The latest generation of \acp{CPU} offer no significant clock-speed improvements over the previous. Furthermore, increases in per-clock performance are lacklustre.
 Physical hardware constraints are to blame for this disappointment. Namely, higher-than-anticipated levels of interference between subcomponents as a result of vastly increased circuit densities.
 
 To combat this stall, hardware manufacturers have responded by increasing the number of independent execution units, or \emph{cores}, present on produced system components. As a result, the total throughput available on a given device has continued to improve.
-Today's data-driven economy generates computational problems of steadily increasing size. Therefore, software engineers must adapt to utilise this increased core-count.
+Today's data-driven economy generates computational problems of relentlessly increasing size. Therefore, software engineers must adapt to utilise this increased core-count.
 
 Unfortunately, this tactic of improving performance by presenting a greater number of compute units is often incompatible with traditional programming approaches. The inapplicability of many tried-and-tested sequential architectural patterns forces engineers to consider new ones.
 
 Constructing a parallel solution requires the study of new concepts, such as synchronisation and data dependencies. The next generation of software engineers are becoming familiar with these issues, but there is currently a significant knowledge-gap.
 
-The necessary switch to parallel programming is not going as smoothly as desired. A short term solution for easing this transition is providing common developers with the capability to easily utilise all compute units within a system.
+The necessary switch to parallel programming is not going as smoothly as desired. A short term solution for easing this transition is to provide common developers with the capability to easily utilise all compute-units within a system.
