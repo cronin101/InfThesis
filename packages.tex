@@ -11,7 +11,12 @@
 \usepackage{amssymb}
 \usepackage{verbatim}
 \usepackage{rotating}
+
 \usepackage{todonotes}
+\let\oldtodo\todo
+\renewcommand\todo[1]{\oldtodo[size=\tiny]{#1}}
+\setlength{\marginparwidth}{2cm}
+
 \usepackage{algpseudocode}
 \usepackage{algorithm}
 \usepackage{tikz}

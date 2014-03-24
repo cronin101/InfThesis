@@ -25,13 +25,13 @@ Part-way through the year, during prototyping, it became clear that there are se
 
 Firstly, users can specify tasks in \ac{OpenCL} kernel form. This is terrible for system usability. Products such as \emph{Hadoop} are successful due to features such as the \emph{streaming \ac{API}}, allowing code to be written in familiar languages when performing parallel tasks on tuple streams.
 
-Secondly, the system could translate an existing language into \ac{OpenCL} kernels. This would allow users to stay within their comfort zone yet still utilise the parallel architecture of many modern systems. Unfortunately, this task is an enormous undertaking. Progress has made recently on generating \ac{CUDA} executables from LLVM \ac{IR}, yet similar breakthroughs for the \ac{OpenCL} platform are lacking.
+Secondly, the system could translate an existing language into \ac{OpenCL} kernels. This would allow users to stay within their comfort zone, yet still utilise the parallel architecture of many modern systems. Unfortunately, this task is an enormous undertaking. Recently, progress has been made on generating \ac{CUDA} executables from LLVM \ac{IR}. Similar breakthroughs for the \ac{OpenCL} platform are lacking.
 \end{itemize}
 
 \paragraph*{Moving away from MapReduce}
-There are clear benefits of utilising familiar languages for orchestrating parallel tasks, such as significant increases in usability.
+There are clear benefits of utilising familiar languages when orchestrating parallel tasks, such as significant increases in usability.
 Yet, it is currently infeasible to translate the entirety of stated programs.
-With this in mind, the decision was made  to lower the scope of direction, with the user stating only parallel subroutines and having \ac{OpenCL} dispatch of said subroutines automated.
+With this in mind, the decision was made to lower the scope of direction, with the user stating only parallel subroutines and having \ac{OpenCL} dispatch of said subroutines automated.
 
 At the close of the first year, a prototype system was produced that allowed a user to perform \verb|map| and \verb|filter| tasks.
 Specification of tasks was provided by a string of C expressions that would be interpolated into stock kernels.
@@ -65,6 +65,7 @@ DEVICE
   .load(:one_to_ten)
   .fp_map(:add_one).fp_filter(:add_three_is_even)
   .output
+#=> [3, 5, 7, 9, 11]
 \end{lstlisting}
 This proof-of-concept demonstrated that performance gains were achievable by performing computation outside the confines of the \ac{RubyVM}.
 
@@ -72,27 +73,27 @@ However, evaluation of the prototype highlighted several flaws:
 \begin{itemize}
     \item Using the library was incredibly verbose. Creating named objects to represent each state of computation meant that a line of pure Ruby code could spawn tens of lines of library code when converted to parallel execution.
 
-    \item Lots of redundant parameters were required by the system. There is no reason for a \verb|map| task to specify it's input parameter type when the syntax can be checked by a compiler. The separate declaration and usage of element variables increased the potential for bugs, in addition to exposing implementation details to the user.
+    \item Lots of redundant parameters were required by the system. There is no reason for a \verb|map| task to specify its input parameter type when the syntax can be checked by a compiler. The separate declaration and usage of element variables increased the potential for bugs, in addition to exposing implementation details to the user.
 
-    \item A lack of task optimisation caused higher-than-necessary workloads. Two consecutive \verb|map| tasks would require two passes over the data instead of just one, as the intermediate result was produced.
+    \item A lack of task optimisation causing higher-than-necessary workloads. Two consecutive \verb|map| tasks would require two passes over the data instead of just one, as the intermediate result was produced despite remaining unused.
 
     \item Code quality was poor. This was mainly due to the combination of venturing into a previously unexperienced programming paradigm, and organic growth of functionality during rapid prototyping.
-
-    A prototype with successful functionality is used to discover the requirements of a system. It is then much easier to redesign a new system, one that is much more elegant yet achieves the same results.
 \end{itemize}
+
+Producing a prototype with full functionality is useful to discover the requirements of a system. It is then much easier to redesign a new system, one that is much more elegant yet achieving the same results.
 
 \paragraph*{Learning from mistakes}
 The system redesign at the start of the second year specifically targeted previously identified flaws:
 \begin{itemize}
-    \item First-class function support allows the library's usage to mirror standard higher-order function usage. Since anonymous function are used, this removes the verbosity of many named objects requiring creation.
+    \item First-class function support allows the library's usage to mirror standard higher-order function usage. Since anonymous function are used, this removes the verbosity of creating many named objects.
 
     \item Some parameters are no-longer required, or inferred, due to a change in internal design. For example, anonymous functions document the input parameter throughout the calculation, so specifying this separately is unnecessary.
 
-      Another example is subroutine type information. The computation pipeline can now keep track of the buffer type at a given point in execution and use this to guide kernel creation, instead of requiring user-submitted type definition.
+      Another example is subroutine type information. The computation pipeline can now keep track of the buffer type at any given point in execution. This can be used to guide kernel creation, instead of requiring user-submitted type definition.
 
     \item By deferring and combining tasks, as documented in the \emph{Design} chapter, unnecessary computation can be avoided.
 
-    \item A redesigned architecture, alongside focusing on testing and ease-of-modification. This helps maintain the software quality of the replacement system, even as requirements shift.
+    \item The system architecture was redesigned, with a focus on testing and ease-of-modification. This helps maintain the software quality of the replacement system, even as requirements shift.
 \end{itemize}
 
 \subsection{Difficulties}
@@ -110,12 +111,12 @@ The difficulties encountered were as follows:
   \item Development in Windows was not possible due to the need to build several system components. The latest Ruby language snapshot and the extension modules necessary for the library to operate must be built, from source, during development. This process is still bug-ridden on non-*NIX systems.
 \end{itemize}
 
-Following these setbacks, the goal of utilising the \ac{APU}'s graphic subsystem in addition to the \ac{CPU} was abandoned. \emph{GNU/Linux} was installed on the desktop system. However, the situation was further hindered when it became clear that the capabilities of NVIDIA's \ac{OpenCL} implementation were vastly overstated. With no support for \ac{OpenCL} $1.2$ and suboptimal performance on $1.1$m the high-end \ac{GPU} present would not provide as much of a performance boost as initially anticipated.
+Following these setbacks, the goal of utilising the \ac{APU}'s graphic subsystem in addition to the \ac{CPU} was abandoned. \emph{GNU/Linux} was installed on the desktop system. However, the situation was further hindered when it became clear that the capabilities of NVIDIA's \ac{OpenCL} implementation were vastly overstated. With no support for \ac{OpenCL} $1.2$ and suboptimal performance using $1.1$, the high-end \ac{GPU} present would not provide as much of a performance boost as initially anticipated.
 
 \paragraph*{Replacement system}
-In order to continue the project's goal of properly exploring the potential benefits of \ac{GPGPU} programming, the decision was made to purchase an `idea' hardware platform to continue development on.
+In order to continue the project's goal of properly exploring the potential benefits of \ac{GPGPU} programming, the decision was made to purchase an `ideal' hardware platform to continue development on.
 
-The system, consisting of an \ac{AMD} \emph{FX-4130} CPU and an \ac{AMD} \emph{R7 260X} \ac{GPGPU}, was ordered and assembled after the initial problems were encountered. This caused a slight stall in development. However, it was estimated that with hardware utilising a single, \ac{AMD} \ac{OpenCL} implementation, productivity would be vastly increased. In fact, this was the case, enough so to make the delay worth experiencing.`
+The system, consisting of an \ac{AMD} \emph{FX-4130} CPU and an \ac{AMD} \emph{R7 260X} \ac{GPGPU}, was ordered and assembled after the initial problems were encountered. This caused a slight stall in development. However, it was estimated that with hardware utilising a single, \ac{AMD} \ac{OpenCL} implementation, productivity would be vastly increased. Luckily, this replacement system was successful enough to make the delay worth experiencing.
 
 \section{Completed Work}
 \subsection{Features}

@@ -18,7 +18,7 @@ Each function description also contains parameters:
 \begin{itemize}
 \item A description of what is being benchmarked.
 \item An \verb|Enumerable| providing seeds to the benchmark environment.
-\item A function that turns each seed into a \emph{input}. This could be any value, given to the benchmarked function, that responds to \verb|size|.
+\item A function that turns each seed into an \emph{input}. This could be any value, given to the benchmarked function, that responds to \verb|size|.
 \item The function to benchmark.
 \end{itemize}
 
@@ -74,13 +74,13 @@ Overall execution time is an important metric. However, it is helpful to be able
 In order to achieve this, code that gathers timing information was introduced to the library's native extensions that interact with hardware devices.
 
 With each action triggered by the system, the resultant transaction time was measured.
-The low-level code, handling device management, obtained measurements via observing the start and stop time of \ac{OpenCL} library functions.
+The low-level code, handling device management, obtains measurements via observing the start and stop time of \ac{OpenCL} library functions.
 This data could then be retrieved by the library and inspected to determine the duration of subtasks, transferring or processing data.
 
-Execution duration measurements are taken by native interaction modules, and observed by the management system.
+Execution duration measurements are taken by native interaction modules, and presented to the management system.
 To make these readings available, configuration flags were added to the \verb|Logger| stating that this data should be displayed during runtime.
 
-An example of the finer granularity timing information presented is given in Listing~\ref{lst:segment_times}.
+An example of the finer granularity of timing information presented is given in Listing~\ref{lst:segment_times}.
 \begin{lstlisting}[
   language=Ruby,
   label=lst:segment_times,

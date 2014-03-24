@@ -1,8 +1,8 @@
 \subsection{Ruby}
 \paragraph*{Language features}
-Ruby\cite{rubylang} is a interpreted, dynamic language, supporting a variety of programming paradigms. It contains many features designed to increase its extensibility via meta-programming.
+Ruby\cite{rubylang} is a interpreted, dynamic language, embracing a variety of programming paradigms. It contains many features designed to increase its extensibility via meta-programming.
 
-Execution centres around the creation of objects, every class inherits from at least \verb|BasicObject|. Function invocation is triggered via sending the target object a \emph{message}.
+Execution centres around the creation of objects, every class inherits from at least \verb|BasicObject|. Function invocation is triggered by sending the target object a \emph{message}.
 
 Upon receipt of a message, it is handled by the lowest level of an objects inheritance-hierarchy \textemdash{} the composed chain of class and module extensions that are mixed-into the object instance. A level will either respond to the message or, if unable to, propagate the request further up the chain.
 
@@ -47,7 +47,7 @@ The benefit of this \emph{duck-testing} is that the same series of of method req
 This technique of redirecting computation will be explored by the RubiCL library. It allows a decoupling of the programmer's requests and the underlying, massively-parallel implementation.
 
 \paragraph*{Native extensions}
-The latest versions of the Ruby language make it simple to produce native extensions. Extensions are provided via C shared objects that interact with the underlying \ac{RubyVM}.
+The latest versions of the Ruby language make it simple to produce native extensions. Functionality is provided by C shared-objects that interact with the underlying \ac{RubyVM}.
 
 \begin{lstlisting}[
   language=C,
@@ -77,7 +77,7 @@ Init_module_example() {
 }
 \end{lstlisting}
 
-Adding functionality is as simple as performing the heavy-lifting as one would in a pure C application. The \verb|ruby.h| library allow the programmer to create a Ruby module or class with mappings between method names and underlying implementations.
+Adding native methods is as simple as performing the heavy-lifting as one would in a pure C application. The \verb|ruby.h| library then allows the programmer to create a Ruby module or class with mappings between method names and the underlying implementations.
 
 \begin{lstlisting}[
   language=Ruby,
@@ -95,13 +95,13 @@ class NativeThing
 end
 \end{lstlisting}
 
-The complication of converting between Ruby objects and basic C types is handled via macros, defined for all sensible conversions.
+The required complication of converting between Ruby objects and basic C types is handled via macros, defined for all sensible conversions.
 
-Once an extension has been compiled, the shared object file is \verb|require|d and the object is available no differently to a pure Ruby implementation. In the case of RubiCL, modules for particular concerns are provided and then mixed-into classes that require native functionality.
+Once an extension has been compiled, the shared-object file is \verb|require|d and the constructed object is available, no differently to a pure Ruby implementation. In the case of RubiCL, modules for particular concerns are provided and then mixed-into classes that require native functionality.
 
 \paragraph*{Suitability as the project's target language}
-The project decided to use Ruby as the target language as, alongside Python, it is often recommended to beginners for analytics and \emph{data science}. This is perhaps due to the syntax being relatively straightforward and often self-documenting.
+The project decided to use Ruby as the target language as, alongside Python, it is often recommended to beginners for analytics and \emph{data-science}. This is perhaps due to the syntax being relatively straightforward and often self-documenting.
 
-Unlike Python, Ruby's design is less opinionated about the \emph{principle of least surprise}, and therefore makes it much easier to be drastically extended in capability while hiding complexity from any users. 
+Unlike Python, Ruby's design is less opinionated about the \emph{principle of least surprise}, and therefore makes it much easier to drastically extend its capability while hiding complexity from unaware users. 
 
-In addition, the need for constant method-hierarchy lookup has been blamed for its poor performance. The potential for dynamic redefinition of methods complicates caching and can heavily impact compute-intensive tasks. This makes Ruby a suitable target for a project aiming to offer an optimised library for such tasks.
+In addition, the need for constant method-hierarchy lookup has been blamed for its poor performance. The potential for dynamic redefinition of methods complicates caching and can heavily impact certain compute-intensive tasks. This makes Ruby a suitable target for a project aiming to offer an optimised library for such tasks.

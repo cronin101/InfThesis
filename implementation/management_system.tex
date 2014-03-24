@@ -1,5 +1,11 @@
 \section{Management System}
 
+\subsection{Converting between Ruby and C objects}
+\todo{Explain this. Macros, bitshifting tagged pointer etc.}
+
+\subsection{Transferring data to and from device}
+\todo{Explain this. Pinned memory vs writebuffer etc.}
+
 \subsection{Function parser}
 The system's function parser is responsible for converting a supplied anonymous function into C syntax. The functionality of the parser is demonstrated in Listing~\ref{lst:parser_ex}
 \begin{lstlisting}[
@@ -44,7 +50,7 @@ parser.to_infix
 The conversion process occurs over three stages: dumping bytecode, lexing, and reconstruction.
 
 \paragraph*{Obtaining function bytecode}
-The bytecode instructions produced by a compiled anonymous function object is provided by the \verb|RubyVM::InstructionSequence| module's \verb|disassemble| method.
+The bytecode instructions, produced by a compiled anonymous function object, are provided by the \verb|RubyVM::InstructionSequence| module's \verb|disassemble| method.
 It returns a human readable string that includes all stack-machine instructions.
 
 \paragraph*{Lexing bytecode string}
@@ -142,10 +148,10 @@ end
   \end{algorithmic}
 \end{algorithm}
 
-The final stage of the conversion pipeline. It requires converting \ac{RPN} to infix form.
+The final stage of the translation process. It requires converting \ac{RPN} to infix form.
 Luckily, this part is less crazy. There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
 
-The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all the mathematical operators required. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
+The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all mathematical operators required by the library. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
 
 \subsection{Task queue}
 The \verb|TaskQueue| management system buffers all deferred tasks, scheduled during the computation pipeline. It is responsible for detecting potential optimisations and applying them prior to dispatch.
@@ -163,7 +169,7 @@ In the order presented, the types of fusion supported are as follows:
 
 \item[Map-mapfilter fusion] No different to \verb|map-filter| fusion. The side-effects of the replaced \verb|map| task are prepended to the \verb|mapfilter|'s preprocessing actions.
 
-\item[Mapfilter-map fusion] Again, advantageous as it avoids scheduling another pass over the data. The side-effects of the unnecessary are appended to the \verb|mapfilter|'s post-processing actions.
+\item[Mapfilter-map fusion] Again, advantageous as it avoids scheduling another pass over the data. The side-effects of the unnecessary \verb|map| are appended to the \verb|mapfilter|'s post-processing actions.
 
 \item[Mapfilter-filter fusion] In \verb|mapfilter| tasks that have no post-processing actions, the \verb|filter| segment can be updated in the same manner as \verb|filter-filter| fusion.
 \end{description}

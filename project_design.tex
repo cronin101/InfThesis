@@ -32,19 +32,19 @@ end
     .to_a
 # => [2, 3]
 
-# Non-lazy function evaluates function 5 times:
+# Non-lazy invocation evaluates 'side_effect_increment' 5 times:
 # >> Non-lazy
 # >> Non-lazy
 # >> Non-lazy
 # >> Non-lazy
 # >> Non-lazy
-# Lazy function evaluates function 3 times:
+# Lazy invocation evaluates 'side_effect_increment' 3 times:
 # >> Lazy
 # >> Lazy
 # >> Lazy
 \end{lstlisting}
 
-Keeping the usage akin to a conceptually similar feature should make the library easier to get to grips with.
+Keeping the usage akin to a conceptually similar feature should make the library easier for inexperienced programmers to get to grips with.
 
 \subsection{Eager or deferred task dispatching}
 During system design, the decision had to be made whether to eagerly evaluate parallel primitives or to buffer all requests and then dispatch when a result is requested. This choice is not straightforward as there are benefits to either option.

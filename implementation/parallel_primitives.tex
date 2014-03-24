@@ -207,6 +207,7 @@ This discovery suggests that it is possible to increase the throughput of \verb|
 
 \paragraph*{\ac{OpenCL} kernel design}
 \todo{Mention differing algorithm, code provided by Apple SDK.}
+\todo{Explain bank conflicts and mitigating their effects.}
 
 \subsection{Scatter}
 The \verb|Scatter| primitives receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
@@ -324,7 +325,7 @@ A sequential implementation of the primitive is shown in Algorithm~\ref{alg:seqf
   \end{algorithmic}
 \end{algorithm}
 
-Checking the predicate is simple to do in parallel, since whether to keep each element depends only on the value of that element. However, producing and returning the subset is slightly more involved. The complication stems from the position of each kept item in the output array depending on the state of previous elements in the input vector.
+Checking the predicate is simple to do in parallel, since whether to keep each element depends only on the value of that element. However, producing and returning the subset is slightly more involved. Complication stems from the position of each kept item in the output array depending on the state of previous elements in the input vector.
 
 \begin{figure}[h]
   \caption{\emph{Filter} dependency graph.}
@@ -424,6 +425,9 @@ The combined process is demonstrated in Algorithm~\ref{alg:parfilter}.
 \end{algorithm}
 
 The parallel loop body is a modified version of the \verb|scatter| task. The divergence is that it only performs scattering if the predicate element is set.
+
+\subsection{Count}
+\todo{Explain count via reuse of previous primitives}
 
 \subsection{Sort}
 \todo{Explain bitonic sort}
