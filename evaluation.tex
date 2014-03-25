@@ -1,0 +1,35 @@
+\chapter{Evaluation}
+This chapter describes the means by which the project's success will be evaluated.
+Since both subjective and objective goals are stated in the \emph{Overview} chapter, this will be taken into account when constructing evaluation criteria.
+
+The results of individual evaluation procedures will be presented in the \emph{Results} chapter, then interpreted in the \emph{Analysis} section.
+
+\section{Recap of project aims}
+\subsection{Objective goals}
+\begin{description}
+\item[Improving the performance of the Ruby language when executing tasks on datasets]
+In order to demonstrate whether exploitable performance improvements are given by the completed project, a series of scenario-driven benchmarks will be constructed.
+The library will then utilised to perform the scenarios and compared against competing solutions: Standard Ruby code, and bespoke native extensions developed solely to achieve the evaluated task.
+Further discussion of all benchmarking will be presented in the \emph{Benchmarking} subsection.
+\item[Increasing the scale of \ac{REPL} experimentation possible]
+This goal depends on favourable results in the previous evaluation criteria, as improved performance should lead to better \ac{REPL} response time. However, unlike the previous benchmark's contenders, there is no longer a need to consider bespoke low-level solutions. This is due to the assumption that not all code is written upfront when investigating data using a \ac{REPL}. As such, someone employed to analyse and draw conclusions from a dataset may not have the skill-set required to produce low-level code on demand.
+\end{description}
+
+\subsection{Subjective goals}
+\begin{description}
+\item[Gracefully extending the Ruby language runtime]
+In order to judge how well the library is designed from a usability perspective, a series of trials will be conducted.
+Each trial will present a participant with a task description to solve, either with or without use of RubiCL.
+The solutions will then be judged on whether applicants had difficulties using the project library, and how it compared to cases where it was not used.
+The experiment design will be discussed in further detail in the \emph{User Evaluation} section.
+\item[Effective reuse of \ac{OpenCL} code]
+Progress towards goal will be investigated by a discussion on code reuse within the project, highlighting any successes. Since it is hard to evaluate, instead it will be presented as a list of what was learned over the course of the project's lifetime.
+\item[Suitability for deployment on unseen systems]
+Portability is hard to measure. There is a near-infinite number of system configurations that could benefit from parallelism libraries. Instead of focusing on trying to install the library on as many systems as possible, installation from scratch will be attempted on a typical deskop system.  The results of this will be presented. In addition, a list of the assumptions made and requirements for the project will be produced. This requirements will then be evaluated, in the context of what was intended during the project's conception.
+\end{description}
+
+\section{Benchmarking}
+
+\section{User Evaluation}
+
+\section{Portability}
