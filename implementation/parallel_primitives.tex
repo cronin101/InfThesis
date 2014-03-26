@@ -325,7 +325,7 @@ A sequential implementation of the primitive is shown in Algorithm~\ref{alg:seqf
   \end{algorithmic}
 \end{algorithm}
 
-Checking the predicate is simple to do in parallel, since whether to keep each element depends only on the value of that element. However, producing and returning the subset is slightly more involved. Complication stems from the position of each kept item in the output array depending on the state of previous elements in the input vector.
+Checking the predicate is simple to do in parallel, since whether to keep each element depends only on the value of that element. However, producing and returning the subset is significantly more involved. Complication stems from the position of each kept item in the output array depending on the state of previous elements in the input vector.
 
 \begin{figure}[h]
   \caption{\emph{Filter} dependency graph.}
@@ -359,7 +359,7 @@ Checking the predicate is simple to do in parallel, since whether to keep each e
   \end{center}
 \end{figure}
 
-The \verb|filter| operation is clearly not \emph{embarrassingly parallel}. However, there is no need to search for an involved parallel algorithm. We can construct an efficient \verb|filter| operation by reusing the previously defined parallel primitives.
+The \verb|filter| operation is clearly not \emph{embarrassingly parallel}. However, there is no need to search for an involved parallel algorithm. We can construct an efficient \verb|filter| operation by reusing the previously defined parallel primitives, \verb|map|, \verb|scan|, and \verb|scatter|. This insight transforms a hard problem into one much easier to solve.
 
 \paragraph*{Composing a parallel solution}
 The first stage of producing a parallel \verb|filter| primitive is recognising the distinct data dependencies:

@@ -3,7 +3,7 @@ Some problems are inherently parallel, containing no dependencies between subtas
 Such tasks are referred to as ``embarrassingly parallel''.
 
 Many \emph{functional programming} primitives, such as \verb|map|, are embarrassingly parallel, or parallelisable at some level of granularity.
-Any operation where the resultant state of each element in a transformed array only depends on a single input can be easily scheduled across many compute units.
+When transforming a dataset, any operation where the resultant state of each element in the output only depends on a single input can be easily scheduled across many compute units.
 
 \begin{figure}[h]
   \includegraphics[width=0.8\textwidth]{./figures/map_task.png}

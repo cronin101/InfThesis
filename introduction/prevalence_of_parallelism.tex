@@ -1,10 +1,9 @@
 \subsection{Prevalence of parallelism}
-As of 2014, many desktop machines contain 4-core \acp{CPU}, capable of scheduling 8 hardware threads simultaneously.
+As of 2014, many desktop machines contain 4-core \acp{CPU}, capable of scheduling 8 hardware threads simultaneously through a technology termed \emph{Hyper-Threading}\cite{marr2002hyper}.
 Depending on whether they are aiming for performance or portability, typical laptop systems contain between 2 and 4 cores.
 Most commodity systems will attempt to improve performance by scheduling a user's tasks across underutilised cores, in order to avoid preemption. This still leaves sequential algorithms facing the bottleneck of a single core's rate of computation.
 
 The other common source of potential parallelism within a system results from advances in computer graphics.
-
 \acp{GPU} are usually responsible for performing various computational stages of the graphics pipeline. They are highly parallel devices, tailored for high performance manipulation of pixel data. The popularity of playing games on home computers has led demand for increasingly powerful \acp{GPU}, producing a more responsive experience for consumers.
 
 In recent generations, hardware manufacturers have explored combining specialised processing units, such as \ac{GPU}, along with \ac{CPU} on a single die. These hybrid devices, known as \ac{APU}, often boast high transfer rates between components. They often allow modest graphical performance within a portable, low power device. As such, many laptops will contain an \ac{APU} instead of two discrete devices.

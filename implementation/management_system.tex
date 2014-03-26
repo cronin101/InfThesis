@@ -149,7 +149,7 @@ end
 \end{algorithm}
 
 The final stage of the translation process. It requires converting \ac{RPN} to infix form.
-Luckily, this part is less crazy. There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
+There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
 
 The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all mathematical operators required by the library. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
 

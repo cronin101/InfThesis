@@ -27,7 +27,7 @@ As Figure~\ref{fig:ocl_model} illustrates, the architecture model presented by \
 \begin{description}
 \item[Host device] The system's \ac{CPU}. It interacts with an execution environment, responsible for discovering and selecting compute devices present on the system. The host device initialises one or more \emph{contexts}, whereby any devices within a single context have access to shared task and memory buffers.
 
-\item[Compute devices] The system's available processing devices, capable of scheduling \ac{OpenCL} kernel work-groups. Before enumerating compute devices, the available \emph{platforms} must be discovered by the runtime. Usually, there is a platform presented for each unique \ac{OpenCL} supporting vendor with hardware installed. Devices are then retrieved on a per-platform bases, either filtered by type (\ac{CPU}/\ac{GPU}) or not.
+\item[Compute devices] The system's available processing devices, capable of scheduling \ac{OpenCL} kernel work-groups. Before enumerating compute devices, the available \emph{platforms} must be discovered by the runtime. Usually, there is a platform presented for each unique \ac{OpenCL} supporting vendor with hardware installed. Devices are then retrieved on a per-platform basis, either filtered by type (\ac{CPU}/\ac{GPU}) or not.
 
 \item[Compute Units] Discrete units of hardware present within a processing devices, capable of scheduling and executing \ac{OpenCL} kernel instances.
 Kernel execution occurs across internal \emph{processing units}, such as \acp{ALU}.
@@ -46,7 +46,7 @@ Kernel instances, scheduled for execution on compute devices, as referred to as 
 
 The \ac{OpenCL} standard calls a collection of work-items a \emph{work-group}. Work-groups are the unit of work dispatched to a device. The number of work-items within a group is set by the programmer, providing the \verb|global_work_size| parameter. Each kernel invocation is enumerated with a global \verb|id|. 
 
-In addition to flat enumeration, the computation can benefit from the abstraction of work \emph{dimensions}. For example, a calculation over $100$ elements can represented as a 2-dimensional $10 \times 10$ calculation. When utilising dimensional abstraction, access to either unique global \verb|id| or $x, y$ offsets is available.
+In addition to flat enumeration, the computation can benefit from the abstraction of work \emph{dimensions}. For example, a calculation over $100$ elements can be represented as a 2-dimensional $10 \times 10$ calculation. When utilising dimensional abstraction, access to either unique global \verb|id| or $x, y$ offsets is available.
 
 Higher dimensions are available for further structuring of tasks. The spatial abstraction provided is particularly useful when there is topological significance to the processed data. In these circumstances, the \verb|local_work_size| parameter provides further benefits.
 
