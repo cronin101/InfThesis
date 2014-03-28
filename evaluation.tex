@@ -8,8 +8,8 @@ The results of individual evaluation procedures will be presented in the \emph{R
 \subsection{Objective goals}
 \begin{description}
 \item[Improving the performance of the Ruby language when executing tasks on datasets]
-In order to demonstrate whether exploitable performance improvements are given by the completed project, a series of scenario-driven benchmarks will be constructed.
-The library will then utilised to perform the scenarios and compared against competing solutions: Standard Ruby code, and bespoke native extensions developed solely to achieve the evaluated task.
+In order to investigate whether exploitable performance improvements are given by the completed project, a series of scenario-driven benchmarks were constructed.
+The library was then utilised to perform the scenarios and compared against competing solutions: Standard Ruby code, and bespoke native extensions developed solely to achieve the evaluated task.
 Further discussion of all benchmarking will be presented in the \emph{Benchmarking} subsection.
 \item[Increasing the scale of \ac{REPL} experimentation possible]
 This goal depends on favourable results in the previous evaluation criteria, as improved performance should lead to better \ac{REPL} response time. However, unlike the previous benchmark's contenders, there is no longer a need to consider bespoke low-level solutions. This is due to the assumption that not all code is written upfront when investigating data using a \ac{REPL}. As such, someone employed to analyse and draw conclusions from a dataset may not have the skill-set required to produce low-level code on demand.
@@ -18,12 +18,12 @@ This goal depends on favourable results in the previous evaluation criteria, as 
 \subsection{Subjective goals}
 \begin{description}
 \item[Gracefully extending the Ruby language runtime]
-In order to judge how well the library is designed from a usability perspective, a series of trials will be conducted.
-Each trial will present a participant with a task description to solve, either with or without use of RubiCL.
-The solutions will then be judged on whether applicants had difficulties using the project library, and how it compared to cases where it was not used.
-The experiment design will be discussed in further detail in the \emph{User Evaluation} section.
+In order to judge how well the library is designed from a usability perspective, a series of user trials were conducted.
+The trial presented each participant with a task description to solve, with the use of RubiCL.
+Notes were taken on applicant performance, specifically whether they had difficulties using the project library.
+Experimental design will be discussed in further detail in the \emph{User Evaluation} section.
 \item[Effective reuse of \ac{OpenCL} code]
-Progress towards goal will be investigated by a discussion on code reuse within the project, highlighting any successes. Since it is hard to evaluate, instead it will be presented as a list of what was learned over the course of the project's lifetime.
+Progress towards this goal will be summarised later  by a discussion on code reuse within the project, highlighting any successes. Since it is hard to evaluate, instead it will be presented as a list of what was learned over the course of the project's lifetime.
 \item[Suitability for deployment on unseen systems]
 Portability is hard to measure. There is a near-infinite number of system configurations that could benefit from parallelism libraries. Instead of focusing on trying to install the library on as many systems as possible, installation from scratch will be attempted on a typical desktop system.  The results of this installation will be presented. In addition, a list of the assumptions made and requirements for the project will be produced. These requirements will then be evaluated, in the context of what was intended during the project's conception.
 \end{description}
@@ -31,5 +31,28 @@ Portability is hard to measure. There is a near-infinite number of system config
 \section{Benchmarking}
 
 \section{User Evaluation}
+The user evaluation procedure was designed to both showcase the potential of the project, when applied to a realistic scenario, and highlight any usability issues of the library.
+\todo{Insert final number of people}
+3 applicants were recruited for a 5 question challenge, using RubiCL to answer questions about a dataset.
 
+The fictitious scenario presented was that of an online banking service with two, separately stored datasets, corresponding to the triggering \verb|user_id| and transfer \verb|amount| of the past $10,000,000$ transactions. Subjects had to utilise higher-order primitives to summarise activity presented in the data, under the guise of investigating a suspicious user.
+\afterpage{
+  \clearpage
+  \begin{landscape}
+    \lstinputlisting[
+      language=Ruby,
+      label=lst:ue_question,
+      caption=The test file full of questions given to each subject.
+    ]{/Users/cronin/Dev/Ruby/HaDope/user_test_attempt_blank.rb}
+  \end{landscape}
+  \clearpage
+  \begin{landscape}
+    \lstinputlisting[
+      language=Ruby,
+      label=lst:ue_answer,
+      caption=Sample answers to the questions given.
+    ]{/Users/cronin/Dev/Ruby/HaDope/user_test_solution.rb}
+
+  \end{landscape}
+}
 \section{Portability}

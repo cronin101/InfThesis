@@ -208,11 +208,16 @@ Stores the entire computation pipeline of the current execution chain. Enqueued 
 
 
 \paragraph*{Example interaction} Figure~\ref{fig:rubicl_components} shows the interactions between classes during a typical parallelised computation.
-\begin{sidewaysfigure}[h]
-  \includegraphics[width=\textwidth]{./figures/arch_components.pdf}
-  \caption{An overview of the interacting software components during the lifetime of a typical computation}
-  \label{fig:rubicl_components}
-\end{sidewaysfigure}
+\afterpage{
+  \clearpage
+  \begin{landscape}
+    \begin{figure}[h]
+      \includegraphics[width=\paperwidth]{./figures/arch_components.pdf}
+      \caption{An overview of the interacting software components during the lifetime of a typical computation}
+      \label{fig:rubicl_components}
+    \end{figure}
+  \end{landscape}
+}
 
 \subsection{Interacting with hardware devices}
 Interaction with hardware devices present on the system occurs via native extensions. These extension modules are mixed-into device singletons, created when the library is first launched. Figure~\ref{fig:rubicl_devices} shows the functionality of these singletons and their subcomponents.
