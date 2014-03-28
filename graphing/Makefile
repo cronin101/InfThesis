@@ -10,4 +10,8 @@ sparse_filter:
 dense_filter:
 	python ./make_graphs.py dense_filter "Dense Filter tasks"
 
-all_graphs: just_map sparse_filter dense_filter
+.PHONY: mapfilter
+mapfilter:
+	python ./make_graphs.py mapfilter "MapFilter tasks"
+
+all_graphs: just_map sparse_filter dense_filter mapfilter

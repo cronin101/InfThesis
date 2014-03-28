@@ -52,6 +52,7 @@ ylim([0, max(vanilla_ruby_laptop)])
 legend(framealpha=0.2, prop={'size':8}, loc='best')
 title(task_description + 'Duration by execution target', fontsize=8)
 savefig(task_directory + '/runtimes.pdf', bbox_inches='tight')
+show()
 
 # percentage of vanilla performance
 bespoke_vp_laptop = [ v / x for (v, x) in zip(vanilla_ruby_laptop, bespoke_ruby_laptop)]
@@ -81,6 +82,7 @@ ylabel('Proportion of vanilla Ruby performance', fontsize=8)
 legend(framealpha=0.2, prop={'size':8}, loc='best')
 title(task_description + 'Proportion of vanilla Ruby performance by execution target', fontsize=8)
 savefig(task_directory + '/prop_van.pdf', bbox_inches='tight')
+show()
 
 # percentage of bespoke performance
 vanilla_bp_laptop = [ b / x for (b, x) in zip(bespoke_ruby_laptop, vanilla_ruby_laptop)]
@@ -110,6 +112,7 @@ ylabel('Proportion of bespoke C extension performance', fontsize=8)
 legend(framealpha=0.2, prop={'size':8}, loc='best')
 title(task_description + 'Proportion of bespoke C extension performance by execution target', fontsize=8)
 savefig(task_directory + '/prop_bes.pdf', bbox_inches='tight')
+show()
 
 # Time per element
 vanilla_pe_laptop = [t / e for (t, e) in zip(vanilla_ruby_laptop, input_sizes)]
@@ -145,4 +148,5 @@ ylabel('Runtime per element (seconds)', fontsize=8)
 legend(framealpha=0.2, prop={'size':8}, loc='best')
 title(task_description + 'Duration per element by execution target', fontsize=8)
 savefig(task_directory + '/per_element.pdf', bbox_inches='tight')
+show()
 
