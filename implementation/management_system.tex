@@ -56,7 +56,7 @@ It returns a human readable string that includes all stack-machine instructions.
 \paragraph*{Lexing bytecode string}
 Instructions of interest are extracted from the human-readable string. This is achieved via a regular expression containing a whitelist of keywords:
 \begin{verbatim}
-/(?:\d*\s*(?:(getlocal.*|putobject.*|opt_.*).?))/
+/(?:\d*\s*(?:(getlocal.*|putobject.*|opt_.*|branch.*).?))/
 \end{verbatim}
 
 The instructions are then tokenised, by the process detailed in Listing~\ref{lst:tokeniser_rules}.
@@ -75,42 +75,36 @@ def translate(operation)
   # First function argument
   when /getlocal_OP__WC__0 #{function.arity + 1}/
     'x'
-
   # Second function argument
   when /getlocal_OP__WC__0 #{function.arity}/
     'y'
-
   # Indexed bound variable
   when /getlocal_OP__WC__1 \d+/
     id = /WC__1 (?<i>\d+)/.match(operation)[:i].to_i
     index = locals_table.length - (id - 1)
     beta_reduction locals_table[index]
-
   # Named bound variable
   when /getlocal\s+\w+,\s\d+/
     name = /getlocal\s+(?<name>\w+),/.match(operation)[:name].to_sym
     beta_reduction name
-
   # Literal Zero
   when /putobject_OP_INT2FIX_O_0_C_/
     0
-
   # Literal One
   when /putobject_OP_INT2FIX_O_1_C_/
     1
-
   # Floating-Point Literal
   when /putobject\s+-?\d+\.\d+/
     operation.split(' ').last.to_f
-
   # Integer Literal
   when /putobject\s+-?\d+/
     operation.split(' ').last.to_i
-
   # Method Sending
   when /opt_send_simple/
     /mid:(?<method>.*?),/.match(operation)[:method].to_sym
-
+  # Conditionals
+  when /branch/
+    LOOKUP_TABLE.fetch operation[/branch\w+/].to_sym
   # Built-in Operator
   when /opt_/
     LOOKUP_TABLE.fetch operation[/opt_\w+/].to_sym
@@ -152,6 +146,11 @@ The final stage of the translation process. It requires converting \ac{RPN} to i
 There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:to_infix}.
 
 The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all mathematical operators required by the library. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
+
+\paragraph*{Handling conditionals}
+Conditional operators, such as \verb|&&|, complicate the reconstruction process. Instead of modifying the value of a stack-machine, they may perform a branch. Whether or not this occurs depends on the \verb|truthyness| of the current value. This is caused by the optimisation of short-circuiting boolean calculations.
+
+Luckily, at the point that the branch is possibly triggered, no mathematical operators will mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply leaving an expression ending in a conditional and starting a new stack. All expressions produced are then simply combined in order after the token stream has been exhausted.
 
 \subsection{Task queue}
 The \verb|TaskQueue| management system buffers all deferred tasks, scheduled during the computation pipeline. It is responsible for detecting potential optimisations and applying them prior to dispatch.

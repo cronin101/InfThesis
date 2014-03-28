@@ -28,22 +28,22 @@ bespoke_ruby_pc = get_list_from_file('pc/bespoke.csv')
 rubicl_cpu_pc = get_list_from_file('pc/cpu.csv')
 rubicl_gpu_pc = get_list_from_file('pc/gpu.csv')
 
-plot(input_sizes, vanilla_ruby_laptop, linestyle='-', marker='o', color='b',
+plot(input_sizes, vanilla_ruby_laptop, linestyle='-', marker='o', markersize=4, color='r',
         label="Vanilla Ruby (Laptop)")
-plot(input_sizes, bespoke_ruby_laptop, linestyle='-', marker='o', color='g',
+plot(input_sizes, bespoke_ruby_laptop, linestyle='-', marker='o', markersize=4, color='k',
         label="Bespoke C Extension (Laptop)")
-plot(input_sizes, rubicl_cpu_laptop, linestyle='-', marker='o', color='r',
+plot(input_sizes, rubicl_cpu_laptop, linestyle='-', marker='o', markersize=4, color='b',
         label="RubiCL on CPU (Laptop)")
-plot(input_sizes, rubicl_gpu_laptop, linestyle='-', marker='o', color='y',
+plot(input_sizes, rubicl_gpu_laptop, linestyle='-', marker='o', markersize=4, color='g',
         label="RubiCL on GPU (Laptop)")
 
-plot(input_sizes, vanilla_ruby_pc, linestyle='--', marker='d', color='b',
+plot(input_sizes, vanilla_ruby_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='r',
         label="Vanilla Ruby (PC)")
-plot(input_sizes, bespoke_ruby_pc, linestyle='--', marker='d', color='g',
+plot(input_sizes, bespoke_ruby_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='k',
         label="Bespoke C Extension (PC)")
-plot(input_sizes, rubicl_cpu_pc, linestyle='--', marker='d', color='r',
+plot(input_sizes, rubicl_cpu_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='b',
         label="RubiCL on CPU (PC)")
-plot(input_sizes, rubicl_gpu_pc, linestyle='--', marker='d', color='y',
+plot(input_sizes, rubicl_gpu_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='g',
         label="RubiCL on GPU (PC)")
 
 xlabel('Dataset size (elements)', fontsize=8)
@@ -63,18 +63,18 @@ bespoke_vp_pc = [ v / x for (v, x) in zip(vanilla_ruby_pc, bespoke_ruby_pc)]
 cpu_vp_pc = [ v / x for (v, x) in zip(vanilla_ruby_pc, rubicl_cpu_pc)]
 gpu_vp_pc = [ v / x for (v, x) in zip(vanilla_ruby_pc, rubicl_gpu_pc)]
 
-plot(input_sizes, bespoke_vp_laptop, linestyle='-', marker='o', color='g',
+plot(input_sizes, bespoke_vp_laptop, linestyle='-', marker='o', markersize=4, color='k',
         label="Bespoke C Extension (Laptop)")
-plot(input_sizes, cpu_vp_laptop, linestyle='-', marker='o', color='r',
+plot(input_sizes, cpu_vp_laptop, linestyle='-', marker='o', markersize=4, color='b',
         label="RubiCL on CPU (Laptop)")
-plot(input_sizes, gpu_vp_laptop, linestyle='-', marker='o', color='y',
+plot(input_sizes, gpu_vp_laptop, linestyle='-', marker='o', markersize=4, color='g',
         label="RubiCL on GPU (Laptop)")
 
-plot(input_sizes, bespoke_vp_pc, linestyle='--', marker='d', color='g',
+plot(input_sizes, bespoke_vp_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='k',
         label="Bespoke C extension (PC)")
-plot(input_sizes, cpu_vp_pc, linestyle='--', marker='d', color='r',
+plot(input_sizes, cpu_vp_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='b',
         label="RubiCL on CPU (PC)")
-plot(input_sizes, gpu_vp_pc, linestyle='--', marker='d', color='y',
+plot(input_sizes, gpu_vp_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='g',
         label="RubiCL on GPU (PC)")
 
 xlabel('Dataset size (elements)', fontsize=8)
@@ -93,18 +93,18 @@ vanilla_bp_pc = [ b / x for (b, x) in zip(bespoke_ruby_pc, vanilla_ruby_pc)]
 cpu_bp_pc = [ b / x for (b, x) in zip(bespoke_ruby_pc, rubicl_cpu_pc)]
 gpu_bp_pc = [ b / x for (b, x) in zip(bespoke_ruby_pc, rubicl_gpu_pc)]
 
-plot(input_sizes, vanilla_bp_laptop, linestyle='-', marker='o', color='b',
+plot(input_sizes, vanilla_bp_laptop, linestyle='-', marker='o', markersize=4, color='r',
         label="Vanilla Ruby (Laptop)")
-plot(input_sizes, cpu_bp_laptop, linestyle='-', marker='o', color='r',
+plot(input_sizes, cpu_bp_laptop, linestyle='-', marker='o', markersize=4, color='b',
         label="RubiCL on CPU (Laptop)")
-plot(input_sizes, gpu_bp_laptop, linestyle='-', marker='o', color='y',
+plot(input_sizes, gpu_bp_laptop, linestyle='-', marker='o', markersize=4, color='g',
         label="RubiCL on GPU (Laptop)")
 
-plot(input_sizes, vanilla_bp_pc, linestyle='--', marker='d', color='b',
+plot(input_sizes, vanilla_bp_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='r',
         label="Vanilla Ruby (PC)")
-plot(input_sizes, cpu_bp_pc, linestyle='--', marker='d', color='r',
+plot(input_sizes, cpu_bp_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='b',
         label="RubiCL on CPU (PC)")
-plot(input_sizes, gpu_bp_pc, linestyle='--', marker='d', color='y',
+plot(input_sizes, gpu_bp_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='g',
         label="RubiCL on GPU (PC)")
 
 xlabel('Dataset size (elements)', fontsize=8)
@@ -125,22 +125,22 @@ bespoke_pe_pc = [t / e for (t, e) in zip(bespoke_ruby_pc, input_sizes)]
 cpu_pe_pc = [t / e for (t, e) in zip(rubicl_cpu_pc, input_sizes)]
 gpu_pe_pc = [t / e for (t, e) in zip(rubicl_gpu_pc, input_sizes)]
 
-plot(input_sizes, vanilla_pe_laptop, linestyle='-', marker='o', color='b',
+plot(input_sizes, vanilla_pe_laptop, linestyle='-', marker='o', markersize=4, color='r',
         label="Vanilla Ruby (Laptop)")
-plot(input_sizes, bespoke_pe_laptop, linestyle='-', marker='o', color='g',
+plot(input_sizes, bespoke_pe_laptop, linestyle='-', marker='o', markersize=4, color='k',
         label="Bespoke C Extension (Laptop)")
-plot(input_sizes, cpu_pe_laptop, linestyle='-', marker='o', color='r',
+plot(input_sizes, cpu_pe_laptop, linestyle='-', marker='o', markersize=4, color='b',
         label="RubiCL on CPU (Laptop)")
-plot(input_sizes, gpu_pe_laptop, linestyle='-', marker='o', color='y',
+plot(input_sizes, gpu_pe_laptop, linestyle='-', marker='o', markersize=4, color='g',
         label="RubiCL on GPU (Laptop)")
 
-plot(input_sizes, vanilla_pe_pc, linestyle='--', marker='d', color='b',
+plot(input_sizes, vanilla_pe_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='r',
         label="Vanilla Ruby (PC)")
-plot(input_sizes, bespoke_pe_pc, linestyle='--', marker='d', color='g',
+plot(input_sizes, bespoke_pe_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='k',
         label="Bespoke C Extension (PC)")
-plot(input_sizes, cpu_pe_pc, linestyle='--', marker='d', color='r',
+plot(input_sizes, cpu_pe_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='b',
         label="RubiCL on CPU (PC)")
-plot(input_sizes, gpu_pe_pc, linestyle='--', marker='d', color='y',
+plot(input_sizes, gpu_pe_pc, linestyle='--', marker='o', markersize=4, fillstyle='left', color='g',
         label="RubiCL on GPU (PC)")
 
 xlabel('Dataset size (elements)', fontsize=8)

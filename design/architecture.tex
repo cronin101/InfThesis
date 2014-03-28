@@ -140,7 +140,7 @@ Where possible, all methods return the device context to allow method chaining.
 
   \item[sum] Returns the summation of all values in the buffer.
 
-  \item[count(Value)] Returns the number of times that the given value appears in the buffer.
+  \item[count(Value?, \&Block? )] If provided with a value, returns the number of times that the given value appears in the buffer. If provided with an anonymous function, returns the number of values in the buffer that satisfy the predicate. If no arguments are provided, returns the length of the buffer.
 \end{description}
 
 \item[LambdaBytecodeParser]
