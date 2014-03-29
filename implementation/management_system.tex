@@ -150,7 +150,7 @@ The conversion algorithm makes the assumption that all non-literals are function
 \paragraph*{Handling conditionals}
 Conditional operators, such as \verb|&&|, complicate the reconstruction process. Instead of modifying the value of a stack-machine, they may perform a branch. Whether or not this occurs depends on the \verb|truthyness| of the current value. This is caused by the optimisation of short-circuiting boolean calculations.
 
-Luckily, at the point that the branch is possibly triggered, no mathematical operators will mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply leaving an expression ending in a conditional and starting a new stack. All expressions produced are then simply combined in order after the token stream has been exhausted.
+Luckily, at the point that the branch is possibly triggered, no mathematical operators will mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply abandoning the current expression, ending in a conditional, and starting a new stack. All expressions produced are then just combined in order after the token stream has been exhausted.
 
 \subsection{Task queue}
 The \verb|TaskQueue| management system buffers all deferred tasks, scheduled during the computation pipeline. It is responsible for detecting potential optimisations and applying them prior to dispatch.

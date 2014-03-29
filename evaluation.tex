@@ -44,13 +44,55 @@ The range of primitives shortlisted for investigation were as follows:
 \end{itemize}
 
 \subsection{Test systems}
+\subsubsection{Hardware}
 Two systems were used for running tests, the \emph{MacBook} used primarily for development and the ordered \ac{AMD} desktop system.
 With library development and regular testing occurring primarily on the laptop, the benchmarking procedure provided an opportunity to evaluate how portable the performance characteristics of the \ac{OpenCL} framework are.
 
 \todo{Specs etc}
+\subsubsection{Software}
+For both hardware systems, several methods of performing each specified task were measured:
+\begin{itemize}
+    \item The standard implementation provided by unmodified Ruby $2.2$.
+    \item A handwritten native extension that performs the task using the optimal sequential method.
+    \item The RubiCL library performing the task, executing on the system \ac{CPU}.
+    \item The RubiCL library performing the task, executing on the system \ac{GPU}.
+\end{itemize}
+
+The standard implementation was included as it is important that comparison between any new solutions and existing functionality is made.
+
+The reason to measure the performance of a bespoke native extension for task, in addition, is as follows:
+By investigating sequential, best-case performance, we can deduce whether performance gains stem purely from parallelism or more-optimal execution. If the library exceeds performance of the best possible sequential implementation, throughput of compute devices has been harnessed most effectively. Otherwise, assuming that the standard implementation performance is exceeded, one of two things is true: Either the library provides throughput gains but the overhead of scheduling parallel tasks through \ac{OpenCL} mitigates any potential improvements. Or, the throughput provided by the increased number of execution units is not enough to compensate for the extra work encountered by the parallel algorithms utilised.
+
+The project's performance on both hardware devices present in the test system was measured so that the relationship between the type of task and the optimal device architecture can be investigated.
 
 \subsection{Method}
-\todo{Explain benchmarking method}
+\subsubsection{Gathering results}
+In order to speed up the process of gathering many benchmark results, a simple utility was produced. Listing~\ref{lst:bm_helper} shows the internals of the \emph{benchmark helper} utility.
+
+Since Ruby is a language that provides automatic memory management and garbage collection of objects, this must be disabled when benchmarking. Otherwise, the large number of repeated tests may trigger a sudden stop-the-world sweep during later timing rounds and skew the results.
+
+To ensure that gathered results represented average use effectively, each benchmark, at a particular dataset size,  was ran $20$ times. The mean of timing information gathered over all repetitions was then returned. This lessens the weighting of anomalous readings, when the system's external utilisation may have reduced performance slightly.
+\lstinputlisting[
+  language=Ruby,
+  label=lst:bm_helper,
+  caption=Helper function defined for benchmarking a block of code.
+]{/Users/cronin/Dev/Ruby/HaDope/bench_helper.rb}
+
+Gathering readings using the helper function involved substituting the block argument with the implementation to test, and calling the utility over a range of sizes.
+Once obtained, the readings for each set of competing software elements were written to disk, available for the graph generation process to consume.
+Listing~\ref{lst:bm_example} shows a typical method of gathering the set of results for a standard Ruby \emph{MapFilter} task.
+\lstinputlisting[
+  language=Ruby,
+  label=lst:bm_example,
+  caption=Using the benchmark helper to gather readings over a range of input datasets.
+]{/Users/cronin/Dev/Ruby/HaDope/benchmark_example.rb}
+
+\subsection{Issues}
+One issue experienced whilst collecting results was the fluctuation in \ac{APU} performance on the test laptop.
+
+Likely due to heat management software, if too many benchmarks were ran in quick succession, the performance of the on-board \ac{GPGPU} would decrease.
+
+This was initially unrealised. Benchmarking throughout library construction ran all tests at once, with the \ac{CPU} system and then the \ac{GPGPU} system being tested. As a result, laptop \ac{GPGPU} performance was consistently under-estimated. Luckily, this outside factor was realised as final benchmarks were being designed. As a result care was taken to reduce the length of benchmark runs and instead schedule more subsets of the desired test range, allowing device temperature to stabilise between measurements.
 
 \section{User Evaluation}
 \subsection{Subjects}
@@ -73,6 +115,14 @@ Subjects were unaware that the provided dataset variables were actually file han
 Users were encouraged to save the test file each time a function body had been specified. An analysis program, listening on file-system events in the working directory, would then call the provided functions, providing test data, and report whether answers given were correct. This gave immediate feedback to subjects as to when they should move on as particular question was solved. In addition to verifying calculated answers, reports of the time taken for each task were collated.
 
 Notes were taken during the study, followed by brief discussion with each finished applicant. Further discussion of user evaluation results and analysis will occur in the \emph{Results} chapter.
+
+\subsubsection{Issues}
+User evaluation took place late in the project's life-cycle. As a result, many potential candidates were reluctant to participate as they were busy working on their own projects.
+Scheduling this session earlier would have helped avoid this.
+
+Another reason to schedule the session earlier is the benefit of using feedback to guide design.
+Luckily, most constructive criticism resultant from the user evaluation trials was simple enough to fix quickly.
+However, any significant issues would be realised too late before the project's deadline to justify an intrusive overhaul.
 \afterpage{
   \clearpage
   \begin{landscape}
