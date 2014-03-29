@@ -29,13 +29,50 @@ Portability is hard to measure. There is a near-infinite number of system config
 \end{description}
 
 \section{Benchmarking}
+\subsection{Range of tests}
+The benchmarking procedure is responsible for investigating how successful the project was with regards to it's performance-oriented goals.
+As such, it must be designed in a way that demonstrates the potential performance of the system, as well as being representative of realistic usage.
+
+The decision was made to test the variety of system primitives in isolation, in addition to a combined task that produces a fused kernel.
+The range of primitives shortlisted for investigation were as follows:
+\begin{itemize}
+  \item A basic \verb|map| task, incrementing the dataset.
+  \item A `dense' \verb|filter| task returning $50\%$ of the input data.
+  \item A `sparse' \verb|filter| task returning $5\%$ of the input data.
+  \item A fused \verb|mapfilter| task, consisting of the previous \verb|map| task followed by the dense \verb|filter| task.
+  \item A \verb|sort| task.
+\end{itemize}
+
+\subsection{Test systems}
+Two systems were used for running tests, the \emph{MacBook} used primarily for development and the ordered \ac{AMD} desktop system.
+With library development and regular testing occurring primarily on the laptop, the benchmarking procedure provided an opportunity to evaluate how portable the performance characteristics of the \ac{OpenCL} framework are.
+
+\todo{Specs etc}
+
+\subsection{Method}
+\todo{Explain benchmarking method}
 
 \section{User Evaluation}
+\subsection{Subjects}
 The user evaluation procedure was designed to both showcase the potential of the project, when applied to a realistic scenario, and highlight any usability issues of the library.
-\todo{Insert final number of people}
-3 applicants were recruited for a 5 question challenge, using RubiCL to answer questions about a dataset.
+7 applicants were recruited for a 5 question challenge, using RubiCL to answer questions about a dataset.
 
 The fictitious scenario presented was that of an online banking service with two, separately stored datasets, corresponding to the triggering \verb|user_id| and transfer \verb|amount| of the past $10,000,000$ transactions. Subjects had to utilise higher-order primitives to summarise activity presented in the data, under the guise of investigating a suspicious user.
+
+When searching for potential test-subjects, care was taken to explore a variety of backgrounds and programming proficiencies.
+As such, the range of applicable skills present in users evaluated ranged from high levels of parallel programming experience to barely any programming experience whatsoever.
+
+\subsection{Method}
+Before testing began, each test-subject was shown a quick demonstration of the project's capabilities, alongside a discussion about the research goal.
+The aim of this quick demonstration was to hint at how the library may be applied to the later provided problems, in addition to an introduction or refresher to Ruby syntax for higher-order functions. After the demonstration concluded, a link\cite{user_test_hints} containing brief \ac{API} documentation was provided. The majority of documentation was lifted directly from the Ruby documentation source, as the library mirrors the \verb|Enumerable| closely. The few additional methods documented were RubiCL specific functionality such as the bifurcation of tuple buffers. The hint document was provided so that stuck or novice users could remind themselves of basic language functionality. Care was taken as to not reveal how to solve problems directly.
+
+Users were provided with a skeleton file, containing a DSL for answering several given questions. Each question accepted an anonymous function response, with bound variables signifying the resources that could be used to answer the query. To respond, each applicant would replace the body of the function, originally a placeholder method, with the required query pipeline.
+
+Subjects were unaware that the provided dataset variables were actually file handles, pointing to large collections of integer data on disk. In addition, the test system \ac{GPGPU} was assigned as the default RubiCL compute device.
+
+Users were encouraged to save the test file each time a function body had been specified. An analysis program, listening on file-system events in the working directory, would then call the provided functions, providing test data, and report whether answers given were correct. This gave immediate feedback to subjects as to when they should move on as particular question was solved. In addition to verifying calculated answers, reports of the time taken for each task were collated.
+
+Notes were taken during the study, followed by brief discussion with each finished applicant. Further discussion of user evaluation results and analysis will occur in the \emph{Results} chapter.
 \afterpage{
   \clearpage
   \begin{landscape}
@@ -55,4 +92,3 @@ The fictitious scenario presented was that of an online banking service with two
 
   \end{landscape}
 }
-\section{Portability}

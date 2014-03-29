@@ -44,6 +44,8 @@ On the other hand, the project's parallel library does not significantly outperf
 Yet, for all systems choosing the optimal device, no less than $80\%$ of the best-presented throughput is achieved at $10$ million elements, improving to no less than $95\%$ at $19$ million.
 With the library providing automatic translation of all functions stated into parallel execution patterns, this deficit is insignificant. Much more significant is the mitigation of the need to write and compile native extensions for every required calculation.
 
+\todo{Smaller scale results for all primitives}
+
 \subsection{Dense Filter tasks}
 \begin{figure}[H]
   \centering
@@ -120,6 +122,7 @@ Instead, the slight change in performance can be explained by differing proporti
 
 As before, the difference in latency between the laptop and desktop systems causes a significant proportional gap for smaller datasets.
 It leaves sparse \emph{Filter} needing the same minimum dataset sizes for beneficial inclusion as dense \emph{Filter}.
+This identical result is useful as it suggests that the threshold for parallelisation can be estimated without prior knowledge of the proportion of data retained.
 
 Yet again, \ac{GPGPU} devices are dominant among the \ac{OpenCL} filtering implementations, for all but the smallest dataset on the desktop.
 Much like the previous graph for filtering, the desktop \ac{GPGPU} does not appear to have plateaued in time-per-element. Therefore, further study should be performed to see at what size dataset this occurs.
@@ -173,3 +176,7 @@ Comparison with a bespoke sequential solution in Figure~\ref{fig:mfilter_task_bp
 The laptop system obtains, at best, $70\%$ performance and the desktop system obtains $50\%$ with further indications of increasing proportion on larger datasets.
 This is even more significant as the manual fusion process of custom extension development is conceptually more involved than distinct tasks.
 As more mutation and filtering conditionals are brought into the loop body, the compiler is able to eradicate more redundant computation but the source code becomes harder to interpret correctly. With RubiCL's task fusion, separately stated pipeline stages are less concept-dense and therefore easier to understand.
+
+\todo{Scan task results and flop}
+
+\section{User evaluation}
