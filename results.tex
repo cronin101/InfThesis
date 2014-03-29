@@ -177,6 +177,29 @@ The laptop system obtains, at best, $70\%$ performance and the desktop system ob
 This is even more significant as the manual fusion process of custom extension development is conceptually more involved than distinct tasks.
 As more mutation and filtering conditionals are brought into the loop body, the compiler is able to eradicate more redundant computation but the source code becomes harder to interpret correctly. With RubiCL's task fusion, separately stated pipeline stages are less concept-dense and therefore easier to understand.
 
-\todo{Scan task results and flop}
+\subsection{Sort tasks}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{./graphing/sort_borked/runtimes.pdf}
+  \caption{Task duration by execution target for sorting arbitrary datasets.}
+  \label{fig:sortbork_task_runtime_g}
+
+  \includegraphics[width=\textwidth]{./graphing/sort_borked/prop_van.pdf}
+  \caption{Proportion of vanilla Ruby performance achieved for sorting arbitrary datasets.}
+  \label{fig:sortbork_van_perf_g}
+
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{./graphing/sort_pow2/runtimes.pdf}
+  \caption{Task duration by execution target for sorting power-of-two sized datasets.}
+  \label{fig:sortpow_task_runtime_g}
+
+  \includegraphics[width=\textwidth]{./graphing/sort_pow2/prop_van.pdf}
+  \caption{Proportion of vanilla Ruby performance achieved for sorting power-of-two sizes datasets.}
+  \label{fig:sortpow_van_perf_g}
+
+\end{figure}
 
 \section{User evaluation}

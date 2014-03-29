@@ -105,7 +105,6 @@ The adapted kernel, now performing \verb|map| computation using a size $\|CU\|$ 
 After benchmarking the execution time of the kernels presented in Algorithms \ref{alg:oclmap} and \ref{alg:oclmap2}, no significant difference in performance was found. This suggests that the overhead for work-unit scheduling within the \ac{OpenCL} framework is very low. It also suggests that simultaneous access to neighbouring global-buffer elements does not affect latency worse than strided simultaneous access.
 
 Influenced by these findings, the decision was made to use Algorithm~\ref{alg:oclmap} for \verb|map| tasks. This is due to the design being conceptually simpler, and therefore choosing the most basic solution that works well.
-\todo{Verify this conclusion on desktop}
 
 \subsection{Scan}
 \verb|Reduce| is a higher-order function that takes an array and an initial `result' value (usually an identity value) and then repeatedly applies a combining function to produce an output.
@@ -206,8 +205,10 @@ Importantly, it is \emph{cost-optimal}, meaning that its cost is equal to that o
 This discovery suggests that it is possible to increase the throughput of \verb|scan| tasks significantly, by scheduling them across massively parallel \ac{OpenCL} devices.
 
 \paragraph*{\ac{OpenCL} kernel design}
-\todo{Mention differing algorithm, code provided by Apple SDK.}
-\todo{Explain bank conflicts and mitigating their effects.}
+In fact, the kernel and calling algorithm utilised differs from \emph{odd-even} scan in that it is designed to perform better on typical \ac{OpenCL} compute devices.
+
+It was adapted from an example provided within the Apple \ac{OpenCL} SDK, modified to allow arbitrary element types and operate on buffers within the RubiCL environment.
+\todo{Explain bank conflicts and mitigating their effects?}
 
 \subsection{Scatter}
 The \verb|Scatter| primitives receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
@@ -427,7 +428,12 @@ The combined process is demonstrated in Algorithm~\ref{alg:parfilter}.
 The parallel loop body is a modified version of the \verb|scatter| task. The divergence is that it only performs scattering if the predicate element is set.
 
 \subsection{Count}
-\todo{Explain count via reuse of previous primitives}
+The \verb|count| function is very similar to the aforementioned \verb|filter| primitive.
+Instead of returning the subset of a dataset that passes a predicate, it returns how many times the predicate was passed.
+
+To avoid writing extra code providing counting functionality, we can re-use many components of the \verb|filter| implementation. Namely, the \verb|map| task that sets predicate bits for each element, followed by the \verb|scan| task to yield the number of kept elements. Reduction can be performed in  less work than a \verb|scan| primitive, as the intermediate values are not required. However it is asymptotically identical, therefore the \verb|scan| primitive can be reused to reduce developer workload.
+Further work can include replacing this suboptimal lack of specialisation with a faster reduction task.
+
 
 \subsection{Sort}
 \todo{Explain bitonic sort}

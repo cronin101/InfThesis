@@ -68,5 +68,8 @@ During system design, the decision had to be made whether to eagerly evaluate pa
 \item Fewer work-units scheduled. It is a waste of iterations to have $3$ \verb|for-loop|s each modify a collection when all operations could occur in a single loop. It is similarly wasteful to execute $N$ work-units $3$ times when only $N$ are needed.
 \end{itemize}
 
-\todo{ Justify choice to defer pipeline }
+The chosen execution style was to defer task requests and then execute optimised tasks when a result is required.
 
+This mirrors the approach taken by many \emph{Object-Relational Mappers}, such as \verb|ActiveRecord|, combining a pipeline of queries into optimal SQL.
+
+The assumption was made that requiring multiple passes over the input dataset was significantly more expensive than the one-off code generation tasks. This was verified by timing information collected during empirical testing.

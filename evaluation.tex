@@ -65,6 +65,15 @@ By investigating sequential, best-case performance, we can deduce whether perfor
 
 The project's performance on both hardware devices present in the test system was measured so that the relationship between the type of task and the optimal device architecture can be investigated.
 
+\paragraph*{Custom native extension}
+The optimal sequential implementation of benchmarked tasks was provided by a handwritten native extension, shown in Listing~\ref{lst:bespoke_c}.
+\lstinputlisting[
+  language=Ruby,
+  label=lst:bespoke_c,
+  caption=Custom native extension performing tasks in the optimal sequential manner.
+]{/Users/cronin/Dev/Ruby/HaDope/bespoke_extension/bespoke_backend.c}
+
+
 \subsection{Method}
 \subsubsection{Gathering results}
 In order to speed up the process of gathering many benchmark results, a simple utility was produced. Listing~\ref{lst:bm_helper} shows the internals of the \emph{benchmark helper} utility.
