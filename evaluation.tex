@@ -73,6 +73,19 @@ The optimal sequential implementation of benchmarked tasks was provided by a han
   caption=Custom native extension performing tasks in the optimal sequential manner.
 ]{/Users/cronin/Dev/Ruby/HaDope/bespoke_extension/bespoke_backend.c}
 
+\subsection{Variety of data-types}
+The RubiCL library supports accelerating computation on homogeneous collections of both \verb|Fixnum| and \verb|Float| objects.
+Benchmarking the full range of parallel primitives on both types and both systems, then commenting in depth on both graphs, would provide a lot of redundant data.
+
+Instead, the performance of the library on integer datasets, across  both hardware systems, will be explored in depth.
+This will be followed by a brief analysis of how performance differs when presented with floating-point datasets.
+
+ The major difference when operating on \verb|Float| objects, is that they lack tagged-pointers. Therefore, the value of each object present must be determined by dereferencing the object pointer and examining the resultant \verb|RFloat| struct. This is impossible to achieve in parallel on an external hardware device, unlike bit-shifting the tagged-pointers of \verb|Fixnum| objects. In addition,  new \verb|RFloat| objects must be created to wrap the computed results.
+ These two stages of extra computation must also be performed by the RubyVM implementation, therefore the RubiCL library should not be significantly disadvantaged.
+
+ Also worth mentioning is the difference in hardware performance concerning integer and floating-point operations. While tasks scheduled on the \ac{CPU} should utilise the same execution units as the RubyVM, tasks scheduled on the \ac{GPGPU} may be affected by how well the hardware is suited to floating-point calculations.
+
+ The two factors mentioned result in a linear increase in pre-processing and post-processing time, and a possible rate-of-computation shift. Therefore, they can be summarised by merely presenting the lower-bound at which computation becomes worth outsourcing for both data-types, alongside measurement of the total speed-up rate achievable.
 
 \subsection{Method}
 \subsubsection{Gathering results}
