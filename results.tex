@@ -236,4 +236,22 @@ Figure~\ref{fig:mapfil_tasksmallrun} shows that the RubiCL library, when executi
 
 \end{figure}
 
+\subsubsection{Recap of operation performed}
+The datasets were sorted in ascending order, by triggering the \verb|sort| method of the dataset.
+RubiCL's implementation of sorting uses parallel bitonic sort. Standard Ruby $2.2$ \verb|Enumerable|s rely on \emph{quicksort}.
+
+\subsubsection{Observations and analysis}
+Figure~\ref{fig:sortbork_task_runtime_g} highlights a critical flaw within RubiCL's \emph{Sort} task implementation.
+Parallel bitonic sorting requires power-of-two sized datasets for the sorting network to operate correctly. In order to utilise the algorithm for general-sized sorting, the library pads the input dataset with \verb|MAX_INT| until the next power-of-two size.
+
+The flaw present stems from an inefficient method of padding and unpadding the dataset. First, the input dataset is copied into the trailing segment of a larger buffer that has been prepended with padding. This is far less efficient than resizing the buffer and writing padding into the end segment, although it was unclear how this could be achieved using the \ac{OpenCL} \ac{API} at the time that the task was implemented. Finally, the dataset is extracted from the front segment of the buffer, as it can be assumed that all padding has propagated to the end. This action uses a buffer copy again, instead of the far more efficient method of returning a sub-buffer. All this unnecessary transfer of data produces an extraneous delay governed by memory bandwidth, and drastically decreases the performance for certain ratios of padding. The inefficient code was written in an attempt to implement the feature quickly and promptly forgotten about.
+
+A large failing of the project in this regard was the fact that benchmarking of the sorting algorithm overlooked using non-power-of-two datasets. Due to the convenience of raising $2$ to a range of powers using the \verb|map| function, this method was used to generate seed sizes within the frequently used benchmarking scripts. Figure~\ref{fig:sortpow_task_runtime_g} shows that for power-of-two datasets, sort performance is not hindered. Therefore, the inefficiency was understandably missed.
+
+Programming error aside, the performance of the sort algorithm on the \ac{CPU} of both systems is unsurprisingly lacking.
+Although asymptotically identical in cost when performing \emph{compare-split} of values at sorting nodes, \emph{bitonic} sort requires much more work than the celebrated \emph{quicksort} algorithm. The increase in throughput provided by scheduling across many hardware threads of a \ac{CPU} was insufficient to offset having to perform a greater number of comparisons.
+
+It is more interesting to note that Figure~\ref{fig:sortpow_van_perf_g} shows when sorting an integer dataset using the laptop's \ac{GPGPU}, performance around $1.5$ times that of inbuilt \emph{quicksort} can be achieved. It's important to realise that this does not mean \ac{GPGPU} sorting will triumph over \emph{quicksort} in other domains, though more efficient \ac{GPGPU} sorting algorithms have been shown to provide significant speedup over \ac{CPU} sorting\cite{sintorn2008fast}. However, it is more likely that in this case a combination of the lack of boxed variables within the RubiCL execution environment, combined with a still-strong sorting algorithm, resulted in performing the task faster than the RubyVM could manage.
+
+For some reason, the performance of the desktop \ac{GPGPU} was not as strong as that of the laptop \ac{GPGPU}. This is disappointing and further work should look into why this is the case.
 \section{User evaluation}
