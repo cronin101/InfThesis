@@ -44,7 +44,14 @@ On the other hand, the project's parallel library does not significantly outperf
 Yet, for all systems choosing the optimal device, no less than $80\%$ of the best-presented throughput is achieved at $10$ million elements, improving to no less than $95\%$ at $19$ million.
 With the library providing automatic translation of all functions stated into parallel execution patterns, this deficit is insignificant. Much more significant is the mitigation of the need to write and compile native extensions for every required calculation.
 
-\todo{Smaller scale results for all primitives}
+\subsubsection{Smaller scale Map tasks}
+\begin{figure}[H]
+  \includegraphics[trim=0cm 8cm 0cm 8cm, clip=true, width=\textwidth]{./graphing/smallmap.pdf}
+  \caption{Duration for smaller-scale \emph{Map} tasks.}
+  \label{fig:map_tasksmallrun}
+\end{figure}
+Figure~\ref{fig:map_tasksmallrun} shows that the RubiCL library, when executing on the laptop system, is beneficial for \emph{Map} tasks containing greater than $20,000$\textendash$25,000$ elements. It also demonstrates that the laptop system experiences task latency of around $20$ms.
+
 
 \subsection{Dense Filter tasks}
 \begin{figure}[H]
@@ -88,6 +95,15 @@ The lacklustre performance for \ac{CPU} devices can be partly explained by the f
 
 This reasoning can also explain why the \ac{GPGPU} devices fail to outperform the custom extension over the given range of datasets.
 Nonetheless, the need to write and compile native extensions for each distinct query performed is again removed when using the RubiCL library. A system-dependent performance hit of between $25\%$ and $50\%$ behind a handwritten extension is far more justifiable when it facilitates rapid-prototyping, especially when compared to the $80\%$ penalty that Figure~\ref{fig:dfilter_task_bperf_g} highlights for unoptimised Ruby $2.2$.
+
+\subsubsection{Smaller scale dense Filter tasks}
+\begin{figure}[H]
+  \includegraphics[trim=0cm 8cm 0cm 8cm, clip=true, width=\textwidth]{./graphing/smalldensefilter.pdf}
+  \caption{Duration for smaller-scale dense \emph{Filter} tasks.}
+  \label{fig:densefil_tasksmallrun}
+\end{figure}
+Figure~\ref{fig:densefil_tasksmallrun} shows that the RubiCL library, when executing on the laptop system, is beneficial for dense \emph{Filter} tasks containing greater than $50,000$ elements. It also demonstrates that the laptop system experiences task latency of around $50$ms.
+
 
 \subsection{Sparse Filter tasks}
 \begin{figure}[H]
@@ -133,6 +149,15 @@ With this in mind, Figure~\ref{fig:sfilter_task_bperf_g} shows a decrease in per
 The inverse is true in Figure~\ref{fig:sfilter_task_vperf_g}, with RubiCL demonstrating an improved $3$\textendash$5$ times speedup when executing on \ac{GPGPU} devices over Ruby $2.2$ for dense filtering.
 The differences in relative performance between dense and sparse \emph{Filter} task implementations suggest that the cause for diverging ratios may result from there being fewer conditional insertions to the result vector. Alternatively, when less data is returned from a compute-device, the one-off latency penalty is more significant and may offset the benefits of relatively-high transfer bandwidth.
 
+\subsubsection{Smaller scale sparse Filter tasks}
+\begin{figure}[H]
+  \includegraphics[trim=0cm 8cm 0cm 8cm, clip=true, width=\textwidth]{./graphing/smallsparsefilter.pdf}
+  \caption{Duration for smaller-scale sparse \emph{Filter} tasks.}
+  \label{fig:sparsefil_tasksmallrun}
+\end{figure}
+Figure~\ref{fig:sparsefil_tasksmallrun} shows that the RubiCL library, when executing on the laptop system, is beneficial for sparse \emph{Filter} tasks containing greater than $50,000$ elements. This is identical to the dense \emph{Filter} cutoff. It also demonstrates that the laptop system experiences task latency of around $50$ms.
+
+
 \subsection{MapFilter tasks}
 \begin{figure}[H]
   \centering
@@ -176,6 +201,15 @@ Comparison with a bespoke sequential solution in Figure~\ref{fig:mfilter_task_bp
 The laptop system obtains, at best, $70\%$ performance and the desktop system obtains $50\%$ with further indications of increasing proportion on larger datasets.
 This is even more significant as the manual fusion process of custom extension development is conceptually more involved than distinct tasks.
 As more mutation and filtering conditionals are brought into the loop body, the compiler is able to eradicate more redundant computation but the source code becomes harder to interpret correctly. With RubiCL's task fusion, separately stated pipeline stages are less concept-dense and therefore easier to understand.
+
+\subsubsection{Smaller scale MapFilter tasks}
+\begin{figure}[H]
+  \includegraphics[trim=0cm 8cm 0cm 8cm, clip=true, width=\textwidth]{./graphing/smallmapfilter.pdf}
+  \caption{Duration for smaller-scale \emph{MapFilter} tasks.}
+  \label{fig:mapfil_tasksmallrun}
+\end{figure}
+Figure~\ref{fig:mapfil_tasksmallrun} shows that the RubiCL library, when executing on the laptop system, is beneficial for sparse \emph{MapFilter} tasks containing greater than $25,000$\textendash$30,000$ elements. It also demonstrates that the laptop system experiences task latency of around $50$ms.
+
 
 \subsection{Sort tasks}
 \begin{figure}[H]
