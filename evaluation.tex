@@ -45,7 +45,7 @@ The range of primitives shortlisted for investigation were as follows:
 
 \subsection{Test systems}
 \subsubsection{Hardware}
-Two systems were used for running tests, the \emph{MacBook} used primarily for development and the ordered \ac{AMD} desktop system.
+Two systems were used for running tests, the \emph{MacBook} laptop used primarily for development and the ordered \ac{AMD} desktop system.
 With library development and regular testing occurring primarily on the laptop, the benchmarking procedure provided an opportunity to evaluate how portable the performance characteristics of the \ac{OpenCL} framework are.
 
 \todo{Specs etc}
@@ -58,15 +58,16 @@ For both hardware systems, several methods of performing each specified task wer
     \item The RubiCL library performing the task, executing on the system \ac{GPU}.
 \end{itemize}
 
-The standard implementation was included as it is important that comparison between any new solutions and existing functionality is made.
+The standard implementation was included as it is important that a comparison between any new solutions and existing functionality is made.
 
-The reason to measure the performance of a bespoke native extension for task, in addition, is as follows:
-By investigating sequential, best-case performance, we can deduce whether performance gains stem purely from parallelism or more-optimal execution. If the library exceeds performance of the best possible sequential implementation, throughput of compute devices has been harnessed most effectively. Otherwise, assuming that the standard implementation performance is exceeded, one of two things is true: Either the library provides throughput gains but the overhead of scheduling parallel tasks through \ac{OpenCL} mitigates any potential improvements. Or, the throughput provided by the increased number of execution units is not enough to compensate for the extra work encountered by the parallel algorithms utilised.
+The reason to additionally measure the performance of a bespoke native extension performing the task is as follows:
+
+By investigating sequential, best-case performance, we can deduce whether performance gains stem purely from parallelism or more-optimal execution. If the library exceeds performance of the best possible sequential implementation, throughput of compute devices has been harnessed most effectively. Otherwise, assuming that the standard implementation performance is exceeded, one of two things is true: Either the library provides throughput gains but the overhead of scheduling parallel tasks through \ac{OpenCL} mitigates any potential improvements. Or, the throughput provided by the increased number of execution units is not enough to compensate for the extra work encountered by the parallel algorithms employed.
 
 The project's performance on both hardware devices present in the test system was measured so that the relationship between the type of task and the optimal device architecture can be investigated.
 
 \paragraph*{Custom native extension}
-The optimal sequential implementation of benchmarked tasks was provided by a handwritten native extension, shown in Listing~\ref{lst:bespoke_c}.
+The optimal sequential implementation of benchmarked tasks was provided by a handwritten C native extension, shown in Listing~\ref{lst:bespoke_c}.
 \lstinputlisting[
   language=Ruby,
   label=lst:bespoke_c,
@@ -75,25 +76,29 @@ The optimal sequential implementation of benchmarked tasks was provided by a han
 
 \subsection{Variety of data-types}
 The RubiCL library supports accelerating computation on homogeneous collections of both \verb|Fixnum| and \verb|Float| objects.
-Benchmarking the full range of parallel primitives on both types and both systems, then commenting in depth on both graphs, would provide a lot of redundant data.
+However, presenting benchmarks of the full range of parallel primitives on both types and both systems, then commenting in depth on both graphs, would provide a lot of redundant data.
 
-Instead, the performance of the library on integer datasets, across  both hardware systems, will be explored in depth.
+Instead, the performance of the library on integer datasets, across both hardware systems, will be explored in depth.
 This will be followed by a brief analysis of how performance differs when presented with floating-point datasets.
 
- The major difference when operating on \verb|Float| objects, is that they lack tagged-pointers. Therefore, the value of each object present must be determined by dereferencing the object pointer and examining the resultant \verb|RFloat| struct. This is impossible to achieve in parallel on an external hardware device, unlike bit-shifting the tagged-pointers of \verb|Fixnum| objects. In addition,  new \verb|RFloat| objects must be created to wrap the computed results.
+ The major difference when operating on \verb|Float| objects, is that they lack tagged-pointers. Therefore, the value of each object present must be determined by dereferencing the object pointer and examining the resultant \verb|RFloat| struct. This is impossible to achieve in parallel on an external hardware device, unlike when bit-shifting the tagged-pointers of \verb|Fixnum| objects. In addition,  new \verb|RFloat| objects must be created to wrap the computed results.
  These two stages of extra computation must also be performed by the RubyVM implementation, therefore the RubiCL library should not be significantly disadvantaged.
 
  Also worth mentioning is the difference in hardware performance concerning integer and floating-point operations. While tasks scheduled on the \ac{CPU} should utilise the same execution units as the RubyVM, tasks scheduled on the \ac{GPGPU} may be affected by how well the hardware is suited to floating-point calculations.
 
  The two factors mentioned result in a linear increase in pre-processing and post-processing time, and a possible rate-of-computation shift. Therefore, they can be summarised by merely presenting the lower-bound at which computation becomes worth outsourcing for both data-types, alongside measurement of the total speed-up rate achievable.
 
+ \paragraph*{Lack of `double' support on Intel HD5000}
+ Unfortunately, the \ac{GPGPU} present on the testing laptop does not support calculation on double precision floating-point numbers.
+ As a result, the floating-point benchmarks presented only document \ac{CPU} performance. This means that merely the linear processing addition, and not the rate-of-computation change, can be commented on.
+
 \subsection{Method}
 \subsubsection{Gathering results}
 In order to speed up the process of gathering many benchmark results, a simple utility was produced. Listing~\ref{lst:bm_helper} shows the internals of the \emph{benchmark helper} utility.
 
-Since Ruby is a language that provides automatic memory management and garbage collection of objects, this must be disabled when benchmarking. Otherwise, the large number of repeated tests may trigger a sudden stop-the-world sweep during later timing rounds and skew the results.
+Since Ruby is a language that provides automatic memory management and garbage collection of objects, this must be disabled when benchmarking. Otherwise, the large number of repeated tests may trigger a sudden stop-the-world sweep during the latter timing rounds and skew the results.
 
-To ensure that gathered results represented average use effectively, each benchmark, at a particular dataset size,  was ran $20$ times. The mean of timing information gathered over all repetitions was then returned. This lessens the weighting of anomalous readings, when the system's external utilisation may have reduced performance slightly.
+To ensure that the results gathered represented average use effectively, each benchmark, at a particular dataset size,  was ran $20$ times. The mean of timing information recorded over all repetitions was then returned. This lessens the weighting of anomalous readings, when the system's external utilisation may have reduced performance slightly.
 \lstinputlisting[
   language=Ruby,
   label=lst:bm_helper,
@@ -112,9 +117,9 @@ Listing~\ref{lst:bm_example} shows a typical method of gathering the set of resu
 \subsection{Issues}
 One issue experienced whilst collecting results was the fluctuation in \ac{APU} performance on the test laptop.
 
-Likely due to heat management software, if too many benchmarks were ran in quick succession, the performance of the on-board \ac{GPGPU} would decrease.
+Likely due to system heat management protocols, if too many benchmarks were ran in quick succession, the performance of the on-board \ac{GPGPU} would decrease.
 
-This was initially unrealised. Benchmarking throughout library construction ran all tests at once, with the \ac{CPU} system and then the \ac{GPGPU} system being tested. As a result, laptop \ac{GPGPU} performance was consistently under-estimated. Luckily, this outside factor was realised as final benchmarks were being designed. As a result care was taken to reduce the length of benchmark runs and instead schedule more subsets of the desired test range, allowing device temperature to stabilise between measurements.
+This was initially unrealised. Initial benchmarking methods, relied on throughout library construction, ran all tests at once, with the \ac{CPU} system and then the \ac{GPGPU} system being tested. As a result, laptop \ac{GPGPU} performance was consistently under-estimated. Luckily, this outside factor was realised as final benchmarks were being designed. As a result, care was taken to reduce the length of benchmark runs and instead schedule more subsets of the desired test range, allowing device temperature to stabilise between measurements.
 
 \section{User Evaluation}
 \subsection{Subjects}
@@ -128,7 +133,7 @@ As such, the range of applicable skills present in users evaluated ranged from h
 
 \subsection{Method}
 Before testing began, each test-subject was shown a quick demonstration of the project's capabilities, alongside a discussion about the research goal.
-The aim of this quick demonstration was to hint at how the library may be applied to the later provided problems, in addition to an introduction or refresher to Ruby syntax for higher-order functions. After the demonstration concluded, a link\cite{user_test_hints} containing brief \ac{API} documentation was provided. The majority of documentation was lifted directly from the Ruby documentation source, as the library mirrors the \verb|Enumerable| closely. The few additional methods documented were RubiCL specific functionality such as the bifurcation of tuple buffers. The hint document was provided so that stuck or novice users could remind themselves of basic language functionality. Care was taken as to not reveal how to solve problems directly.
+The aim of this quick demonstration was to hint at how the library may be applied to the later provided problems, in addition to an introduction or refresher to Ruby syntax for higher-order functions. After the demonstration concluded, a link\cite{user_test_hints} containing brief \ac{API} documentation was provided. The majority of documentation was lifted directly from the Ruby documentation source, as the library mirrors the \verb|Enumerable| \ac{API} closely. The few additional methods documented were RubiCL specific functionality such as the bifurcation of tuple buffers. The hint document was provided so that stuck or novice users could remind themselves of basic language functionality. Care was taken as to not reveal how to solve problems directly.
 
 Users were provided with a skeleton file, containing a DSL for answering several given questions. Each question accepted an anonymous function response, with bound variables signifying the resources that could be used to answer the query. To respond, each applicant would replace the body of the function, originally a placeholder method, with the required query pipeline.
 
