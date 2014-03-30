@@ -14,7 +14,7 @@ When transforming a dataset, any operation where the resultant state of each ele
 Other tasks are more complicated, and require structuring as the composition of concurrent subtasks.
 In the worst case, computing a result requires communication and synchronisation between parallel subproblems.
 
-When manually parallelising code, programmers must be familiar with designing multithreaded algorithms. Subcomponents that cooperate must be produced in order to achieve processing speedup.
+When manually parallelising code, programmers must be familiar with designing multithreaded algorithms. Subcomponents that cooperate must be produced in order to achieve processing speed-up.
 
 This effort is often unnecessary. Certain primitives are known to be suitable for parallel execution. These can be algorithmically scheduled across multiple compute units. By automating this translation and scheduling task, programmers can achieve increased throughput without the need for extensive studying and configuration.
 

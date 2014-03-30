@@ -4,7 +4,7 @@ Before detailing the specific algorithms  used by the RubiCL project, it is nece
 
 \ac{CPU} and \ac{GPGPU} architectures have diverged significantly due to differing traditional applications.
 
-\ac{CPU} devices have had a long history of optimisation for sequential processing. As such, they have high clock-speeds and integrated hardware designed to increase instruction throughput; Modern processors rely heavily on \emph{branch predictors} and identifying opportunities for speedup via \emph{out-of-order execution}.
+\ac{CPU} devices have had a long history of optimisation for sequential processing. As such, they have high clock-speeds and integrated hardware designed to increase instruction throughput; Modern processors rely heavily on \emph{branch predictors} and identifying opportunities for speed-up via \emph{out-of-order execution}.
 
 Conversely, the graphics pipeline tends to mainly utilise \ac{SIMD} operations. These consist of periods where the same few calculations are applied to vast quantities of data. With this execution pattern, complicated optimising hardware and higher clock-speeds are less favourable. Instead, hardware designers achieve incredible throughput by placing many massively parallel, yet simple, execution units on a single chipset.
 
