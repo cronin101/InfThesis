@@ -1,8 +1,23 @@
 \section{Management System}
 
 \subsection{Converting between Ruby and C objects}
-\todo{Explain this. Macros, bitshifting tagged pointer etc.}
+One important issue to overcome when designing an library to accelerate Ruby processing, is the fact that the RubyVM stores all values within \emph{objects}, in a manner that is very different from C.
 
+Internally, the RubyVM's C implementation references all objects as of type \verb|VALUE|. This value-type is a slight misnomer as it (usually) contains a pointer to an object structure.
+
+There are several object structures used to represent raw data within the RubyVM. However they all fall into one of two categories:
+\begin{itemize}
+     \item \verb|RObject| for storing the state of any bespoke object. This includes storage of instance variables and a pointer to the corresponding class hierarchy for lookup of all methods defined.
+     \item A specialised object representation, used to increase performance of heavily utilised object types. Examples include \verb|RString|, \verb|RFloat|, and \verb|RArray|.
+\end{itemize}
+
+The first member of both structures is another structure called \verb|RBasic|. This contains meta-data about the object, such as what type it is. Therefore, it is possible to obtain the typing information of object designated by a \verb|VALUE|, by examining the meta-data present in it's first structure member.
+
+Since integers are often heavily utilised within computer programs, and often short-lived, the RubyVM implementation avoids the creation of integer objects in order to improve performance.
+Instead, it encodes the value of the first $2^{64 - 2}$ integers directly into the \verb|VALUE| `pointer', setting the final 2 bits as the flag \verb|0x01|.
+It can be deduced that a pointer with an odd value is not pointing to a valid memory location, as is true for any pointer that does not align to word-length boundaries. In this case, a flag lookup table can be used in order to determine the correct typing information.
+
+When dealing with tagged-pointers, the corresponding value of pointer \verb|p| can be retrieved with \verb|p >> 1|. To create a tagged-pointer, the value \verb|x| can be encoded with \verb?(x << 1) | 0x01 ?. The RubiCL project utilises this fact by transferring an array of \verb|VALUE| pointers directly to the compute-device, whenever annotation has suggested that all contained elements are of \verb|Fixnum| type. There, the bit-shifting conversions, present at either end of the computation pipeline, can be performed in parallel to increase throughput.
 \subsection{Transferring data to and from device}
 \todo{Explain this. Pinned memory vs writebuffer etc.}
 
