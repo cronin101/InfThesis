@@ -199,7 +199,7 @@ In the order presented, the types of fusion supported are as follows:
 
 \item[Mapfilter-map fusion] Again, advantageous as it avoids scheduling another pass over the data. The side-effects of the unnecessary \verb|map| are appended to the \verb|mapfilter|'s post-processing actions.
 
-\item[Mapfilter-filter fusion] In \verb|mapfilter| tasks that have no post-processing actions, the \verb|filter| segment can be updated in the same manner as \verb|filter-filter| fusion.
+\item[Mapfilter-filter fusion] In \verb|mapfilter| tasks that have no post-processing actions, the \verb|filter| segment can be updated in the same manner as when undergoing \verb|filter-filter| fusion.
 \end{description}
 
 \begin{lstlisting}[

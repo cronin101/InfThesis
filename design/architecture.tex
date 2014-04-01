@@ -239,7 +239,8 @@ Interaction with hardware devices present on the system occurs via native extens
 
 Both \verb|CPU| and \verb|GPU| objects, tasked with managing device state, inherit from a common \verb|Device| superclass. The main difference in their implementation is differing initialisation procedure. Having two device types allows target-specific optimisation by the code generator, shown later.
 
-The \verb|Device| subclasses delegate maintaining the list of tasks to a \verb|TaskQueue| object. In addition, they lack the ability to call memory management functions on devices and instead trigger functionality via an instance of \verb|DeviceService::BufferManager|.
+The \verb|Device| subclasses delegate maintaining the list of tasks to a \verb|TaskQueue| object. In addition, they lack the ability to call memory management functions on devices.
+Instead of handling device memory directly, \verb|Device| objects request functionality through an instance of \verb|DeviceService::BufferManager|.
 
 Implementing all device logic that does not require hardware interoperability in Ruby made the system much easier to test. The time taken for the device control flow to execute is insignificant compared to the time taken for data processing. Writing this section in C would have been misguided as the performance benefits would not be worth the impaired rate of development.
 
