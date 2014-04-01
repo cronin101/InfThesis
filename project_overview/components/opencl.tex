@@ -56,7 +56,7 @@ Much of the project's implementation effort concerning \ac{OpenCL} will be mappi
 The fact that this task is so laborious is a reason why heterogeneous parallel programming on the \ac{OpenCL} platform is still under-utilised in the wild.
 
 \paragraph*{Comparison with CUDA}
-\ac{OpenCL} is not the only available computation framework for interacting with \ac{GPGPU} devices. As mentioned earlier, a competing technology is NVIDIA's \ac{CUDA}.
+\ac{OpenCL} is not the only available computation framework for interacting with \ac{GPU} devices. As mentioned earlier, a competing technology is NVIDIA's \ac{CUDA}.
 
 During the planning phase, RubiCL considered both choices. Ultimately, the decision was made to use \ac{OpenCL} over \ac{CUDA} for several major reasons:
 
@@ -64,8 +64,8 @@ During the planning phase, RubiCL considered both choices. Ultimately, the decis
   \item[Multiple vendor support]
     \ac{CUDA} is not an open standard. Its parallelism framework is only available on NVIDIA hardware. Using a library supported only by a single vendor to provide the project's hardware interfacing would lead to far fewer systems being able to benefit from accelerated processing.
 
-  \item[CPU and GPGU execution]
-    By using \ac{OpenCL}, RubiCL will be able to execute kernels on both \ac{CPU} and \ac{GPGPU} devices. This contrasts the \ac{GPGPU}-only focus of \ac{CUDA}.
+  \item[CPU and GPU execution]
+    By using \ac{OpenCL}, RubiCL will be able to execute kernels on both \ac{CPU} and \ac{GPU} devices. This contrasts the \ac{GPU}-only focus of \ac{CUDA}.
     This greatly increases development convenience. Development can occur on a mobile laptop, functionally tested with its \ac{CPU}. Afterwards, the library will be transferred to desktop workstations for performance testing on a variety of hardware.
 
     In addition, this opens up the possibility of attempting code execution on both devices concurrently. This will investigate whether complete system-wide utilisation is beneficial for a single computation.

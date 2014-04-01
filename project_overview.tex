@@ -19,7 +19,7 @@ Part-way through the year, during prototyping, it became clear that there are se
 \begin{itemize}
 \item The runtime resource management is overkill on a singular, massively parallel machine. When isolated failure is unlikely, more lightweight processing paradigms can be used with greater efficiency.
 
-\item Previous projects have hit issues caused by \ac{GPGPU} architecture. For example, tasks that emit tuples must be run twice: Once to count the number of tuples emitted, and again to actually produce the results. This is needed as \ac{OpenCL} kernels do not allow dynamic allocation of memory.
+\item Previous projects have hit issues caused by \ac{GPU} architecture. For example, tasks that emit tuples must be run twice: Once to count the number of tuples emitted, and again to actually produce the results. This is needed as \ac{OpenCL} kernels do not allow dynamic allocation of memory.
 
 \item Since \ac{OpenCL} compute devices execute only kernels, there are just two options for task specification:
 
@@ -100,9 +100,9 @@ The system redesign at the start of the second year specifically targeted previo
 Several unforeseen issues have slowed down progress in certain stages of the project's progression.
 
 \paragraph*{Initial development system}
-The target \ac{GPGPU} test-bed was originally a desktop system containing a NVIDIA \emph{GTX 670} \ac{GPU}. It also contained an Intel \emph{Haswell} \ac{APU}. Unfortunately, it became clear during the process of porting the codebase, initially developed solely on a MacBook, that the state of the required libraries was much worse than advertised.
+The target \ac{GPU} test-bed was originally a desktop system containing a NVIDIA \emph{GTX 670} \ac{GPU}. It also contained an Intel \emph{Haswell} \ac{APU}. Unfortunately, it became clear during the process of porting the codebase, initially developed solely on a MacBook, that the state of the required libraries was much worse than advertised.
 
-Had the libraries for the system been available, the produced framework would allow task scheduling on either compute device within the \ac{APU}, or the \ac{GPGPU}.
+Had the libraries for the system been available, the produced framework would allow task scheduling on either compute device within the \ac{APU}, or the \ac{GPU}.
 
 The difficulties encountered were as follows:
 \begin{itemize}
@@ -114,9 +114,9 @@ The difficulties encountered were as follows:
 Following these setbacks, the goal of utilising the \ac{APU}'s graphic subsystem in addition to the \ac{CPU} was abandoned. \emph{GNU/Linux} was installed on the desktop system. However, the situation was further hindered when it became clear that the capabilities of NVIDIA's \ac{OpenCL} implementation were vastly overstated. With no support for \ac{OpenCL} $1.2$ and suboptimal performance using $1.1$, the high-end \ac{GPU} present would not provide as much of a performance boost as initially anticipated.
 
 \paragraph*{Replacement system}
-In order to continue the project's goal of properly exploring the potential benefits of \ac{GPGPU} programming, the decision was made to purchase an `ideal' hardware platform to continue development on.
+In order to continue the project's goal of properly exploring the potential benefits of \ac{GPU} programming, the decision was made to purchase an `ideal' hardware platform to continue development on.
 
-The system, consisting of an \ac{AMD} \emph{FX-4130} CPU and an \ac{AMD} \emph{R7 260X} \ac{GPGPU}, was ordered and assembled after the initial problems were encountered. This caused a slight stall in development. However, it was estimated that with hardware utilising a single, \ac{AMD} \ac{OpenCL} implementation, productivity would be vastly increased. Luckily, this replacement system was successful enough to make the delay worth experiencing.
+The system, consisting of an \ac{AMD} \emph{FX-4130} CPU and an \ac{AMD} \emph{R7 260X} \ac{GPU}, was ordered and assembled after the initial problems were encountered. This caused a slight stall in development. However, it was estimated that with hardware utilising a single, \ac{AMD} \ac{OpenCL} implementation, productivity would be vastly increased. Luckily, this replacement system was successful enough to make the delay worth experiencing.
 
 \section{Completed Work}
 \subsection{Features}

@@ -1,5 +1,5 @@
 \subsection{HadoopCL}
-HadoopCL\cite{hadoopcl} is an extension to the Hadoop\cite{hadoop} distributed-filesystem and computation framework. Again, it provides scheduling and execution of generic tasks on  \ac{GPGPU} hardware. Since it uses \ac{OpenCL}, as opposed to \ac{CUDA}, it also supports execution on \ac{CPU} devices.
+HadoopCL\cite{hadoopcl} is an extension to the Hadoop\cite{hadoop} distributed-filesystem and computation framework. Again, it provides scheduling and execution of generic tasks on  \ac{GPU} hardware. Since it uses \ac{OpenCL}, as opposed to \ac{CUDA}, it also supports execution on \ac{CPU} devices.
 
 One benefit, for usability, of HadoopCL over MARS is the usage of the \verb|aparapi| library\cite{aparapi} to generate required task kernels. Often,  composing and scheduling custom \ac{OpenCL} kernels requires significant amount of boilerplate. The purely-Java \ac{API} allows programmers to skip a large portion of this boilerplate and focus instead on the task at hand.
 

@@ -1,18 +1,18 @@
 \chapter{Implementation}
-\section{Differences between CPU and GPGPU hardware}
+\section{Differences between CPU and GPU hardware}
 Before detailing the specific algorithms  used by the RubiCL project, it is necessary to contrast two of the heterogeneous target architectures.
 
-\ac{CPU} and \ac{GPGPU} architectures have diverged significantly due to differing traditional applications.
+\ac{CPU} and \ac{GPU} architectures have diverged significantly due to differing traditional applications.
 
 \ac{CPU} devices have had a long history of optimisation for sequential processing. As such, they have high clock-speeds and integrated hardware designed to increase instruction throughput; Modern processors rely heavily on \emph{branch predictors} and identifying opportunities for speed-up via \emph{out-of-order execution}.
 
 Conversely, the graphics pipeline tends to mainly utilise \ac{SIMD} operations. These consist of periods where the same few calculations are applied to vast quantities of data. With this execution pattern, complicated optimising hardware and higher clock-speeds are less favourable. Instead, hardware designers achieve incredible throughput by placing many massively parallel, yet simple, execution units on a single chipset.
 
-In short, common \ac{GPGPU} hardware lacks many optimisations targeting single-threaded performance. More significantly, devices lack the ability to branch by jumping during execution. A flat sequence of instructions is processed by the hardware scheduler. Conditional logic is provided by condition-variable flags set on individual instructions. These masking flags state whether execution of each statement within a branch segment should occur.
+In short, common \ac{GPU} hardware lacks many optimisations targeting single-threaded performance. More significantly, devices lack the ability to branch by jumping during execution. A flat sequence of instructions is processed by the hardware scheduler. Conditional logic is provided by condition-variable flags set on individual instructions. These masking flags state whether execution of each statement within a branch segment should occur.
 
 The inability to jump causes code that branches to be necessarily inefficient. Any branching logic within a kernel will leave some execution units idling until the code path converges again.
 
-Luckily, \ac{GPGPU} devices compensate by being exceptional at tasks resembling those that they were designed for: \ac{SIMD} computation patterns. A high-end \ac{GPU}, such as the \emph{Radeon R9 290X}, can contain as many as $44$ compute-units. Each compute unit is capable of scheduling $64$ concurrent \ac{SIMD} operations. At full utilisation, this vastly outperforms the raw instruction-rate of any \ac{CPU} device. The amount of parallelism possible in a latest-generation desktop \ac{GPGPU} is simply several orders of magnitude higher.
+Luckily, \ac{GPU} devices compensate by being exceptional at tasks resembling those that they were designed for: \ac{SIMD} computation patterns. A high-end \ac{GPU}, such as the \emph{Radeon R9 290X}, can contain as many as $44$ compute-units. Each compute unit is capable of scheduling $64$ concurrent \ac{SIMD} operations. At full utilisation, this vastly outperforms the raw instruction-rate of any \ac{CPU} device. The amount of parallelism possible in a latest-generation desktop \ac{GPU} is simply several orders of magnitude higher.
 
 The goal of this project's implementation phase is to produce an easy-to-use library that presents significant throughput gains to an end-user performing common tasks.
 

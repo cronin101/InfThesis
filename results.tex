@@ -32,7 +32,7 @@ Performing little work in the supplied function body produces a worst-case evalu
 \paragraph*{Observations and analysis}
 Figure~\ref{fig:map_task_runtime_g} shows that all trialled alternatives exhibit similar performance when executing \emph{Map} tasks.
 This is likely due to the computational simplicity of the task. The probable cause for the bottleneck is the need to move data in and out of the RubyVM's internal array structures.
-Although the gap is slight, the \ac{CPU} compute-devices installed in both machines outperform the \acp{GPGPU} over the range of tested datasets. This is easiest to observe in Figure~\ref{fig:map_task_per_el_g}.
+Although the gap is slight, the \ac{CPU} compute-devices installed in both machines outperform the \acp{GPU} over the range of tested datasets. This is easiest to observe in Figure~\ref{fig:map_task_per_el_g}.
 
 When parallelising purely-map tasks, the project library performs favourably compared to the standard \verb|Enumerable#map| implementation of Ruby $2.2$. Figure~\ref{fig:map_task_vperf_g} demonstrates that, at best, a factor $3.5$\textendash$4$ speed-up over typical execution can be achieved on both systems.
 The figure also shows that for all tested datasets, the smallest of which contained $1$ million elements, outsourcing computation to the library was beneficial.
@@ -103,17 +103,17 @@ The dense \emph{Filter} task performed was the equivalent of \verb!#select { |x|
 Figure~\ref{fig:dfilter_task_runtime_g} is less cluttered than the corresponding graph for \emph{Map} tasks, as there is more variation between the performance of dense \emph{Filter} implementations.
 The figure suggests that \emph{Filter} tasks scheduled on the desktop system suffer from a higher latency than their counterparts on the laptop. This is signified by the comparatively elevated runtime for smaller datasets.
 
-Further unlike \emph{Map} tasks, on both systems the \ac{GPGPU} compute-devices outperform the \ac{CPU} when filtering large datasets. For the laptop system, the domination is present on every tested dataset size. On the contrary, the desktop \ac{CPU} is initially a shade faster but is quickly dwarfed by the significantly higher throughput of the \ac{GPGPU} device.
+Further unlike \emph{Map} tasks, on both systems the \ac{GPU} compute-devices outperform the \ac{CPU} when filtering large datasets. For the laptop system, the domination is present on every tested dataset size. On the contrary, the desktop \ac{CPU} is initially a shade faster but is quickly dwarfed by the significantly higher throughput of the \ac{GPU} device.
 
-On the laptop system, Figure~\ref{fig:dfilter_task_vperf_g} demonstrates that the library is beneficial when processing all datasets within the tested range. The desktop is not quite as successful at performing dense purely-\emph{Filter} tasks, hampered when producing subsets of smaller datasets by its increased latency. At least $5$ million elements are required before it is worthwhile to offload computation onto the \ac{GPGPU} via RubiCL. The \ac{CPU} trails not long after, at $8$ million elements, but never achieves more than $25\%$ speed-up over the standard Ruby implementation.
+On the laptop system, Figure~\ref{fig:dfilter_task_vperf_g} demonstrates that the library is beneficial when processing all datasets within the tested range. The desktop is not quite as successful at performing dense purely-\emph{Filter} tasks, hampered when producing subsets of smaller datasets by its increased latency. At least $5$ million elements are required before it is worthwhile to offload computation onto the \ac{GPU} via RubiCL. The \ac{CPU} trails not long after, at $8$ million elements, but never achieves more than $25\%$ speed-up over the standard Ruby implementation.
 
-On both test systems, when using the \ac{GPGPU}, noticeable speed-up of \emph{Filter} operations can be achieved. With a $2.5$ times speed-up on the desktop and over $3.5$ times on the laptop, large filtering operations are significantly accelerated by the RubiCL library.
+On both test systems, when using the \ac{GPU}, noticeable speed-up of \emph{Filter} operations can be achieved. With a $2.5$ times speed-up on the desktop and over $3.5$ times on the laptop, large filtering operations are significantly accelerated by the RubiCL library.
 
-Figure~\ref{fig:dfilter_task_bperf_g} shows that the laptop \ac{GPGPU} achieves a high proportion, peaking at $75\%$, of bespoke sequential code performance. The desktop system boasts a lesser proportion, at $50\%$, but the lack of plateau in the figure suggests that this gap would close further as datasets increase in size.
+Figure~\ref{fig:dfilter_task_bperf_g} shows that the laptop \ac{GPU} achieves a high proportion, peaking at $75\%$, of bespoke sequential code performance. The desktop system boasts a lesser proportion, at $50\%$, but the lack of plateau in the figure suggests that this gap would close further as datasets increase in size.
 
 The lacklustre performance when executing on \ac{CPU} devices can be partly explained by the fact that the parallel implementation of filtering, although asymptotically identical in cost, requires much more work than a sequential filter. In this case, the hidden constants involved for distributing computation have a large effect on the task duration, larger than that of parallelising the predicate scan and index calculations along the data.
 
-This reasoning can also explain why the \ac{GPGPU} devices fail to outperform the custom extension over the given range of datasets.
+This reasoning can also explain why the \ac{GPU} devices fail to outperform the custom extension over the given range of datasets.
 Nonetheless, the need to write and compile native extensions for each distinct query performed is again removed when using the RubiCL library. A system-dependent performance hit of between $25\%$ and $50\%$ behind a handwritten extension is far more justifiable when it facilitates rapid-prototyping, especially when compared to the $80\%$ penalty that Figure~\ref{fig:dfilter_task_bperf_g} highlights for unoptimised Ruby $2.2$.
 
 \paragraph*{Smaller scale dense Filter tasks}
@@ -178,13 +178,13 @@ As before, the difference in latency between the laptop and desktop systems caus
 It leaves sparse \emph{Filter} needing the same minimum dataset sizes for beneficial inclusion as dense \emph{Filter}.
 This identical result is useful as it suggests that the threshold for parallelisation can be estimated without prior knowledge of the proportion of data retained.
 
-Yet again, \ac{GPGPU} devices are dominant among the \ac{OpenCL} filtering implementations, for all but the smallest dataset on the desktop.
-Much like the previous graph for filtering, the desktop \ac{GPGPU} does not appear to have plateaued in time-per-element. Therefore, further study should be performed to see at what size dataset this occurs.
+Yet again, \ac{GPU} devices are dominant among the \ac{OpenCL} filtering implementations, for all but the smallest dataset on the desktop.
+Much like the previous graph for filtering, the desktop \ac{GPU} does not appear to have plateaued in time-per-element. Therefore, further study should be performed to see at what size dataset this occurs.
 
 The bespoke extension performs much better comparatively at sparse filtering than dense filtering. Figure~\ref{fig:sfilter_task_vperf_g} shows a $9$ times performance speed-up over unoptimised code, nearly twice the speed-up of dense filtering.
 With this in mind, Figure~\ref{fig:sfilter_task_bperf_g} shows a decrease in performance of RubiCL relative to bespoke filtering, compared to the denser predicate examined earlier.
 
-The inverse is true in Figure~\ref{fig:sfilter_task_vperf_g}, with RubiCL demonstrating an improved $3$\textendash$5$ times speed-up when executing on \ac{GPGPU} devices over Ruby $2.2$ for dense filtering.
+The inverse is true in Figure~\ref{fig:sfilter_task_vperf_g}, with RubiCL demonstrating an improved $3$\textendash$5$ times speed-up when executing on \ac{GPU} devices over Ruby $2.2$ for dense filtering.
 The differences in relative performance between dense and sparse \emph{Filter} task implementations suggest that the cause for diverging ratios may result from there being fewer conditional insertions to the result vector. Alternatively, when less data is returned from a compute-device, the one-off latency penalty is more significant and may offset the benefits of relatively-high transfer bandwidth.
 
 \paragraph*{Smaller scale sparse Filter tasks}
@@ -250,9 +250,9 @@ Figure~\ref{fig:mfilter_task_runtime_g} demonstrates how significantly runtime d
 The need for multiple passes over the data greatly delays the unoptimised code, as intermediate yet discarded results for the method pipeline are computed.
 The optimisation can be seen to reduce the minimum dataset length required for RubiCL's desktop parallelism to provide performance gains over the standard implementation, shown in Figure~\ref{fig:mfilter_task_vperf_g}. At just $2$ million elements, it is less than half of that required when filtering alone.
 
-Figure~\ref{fig:mfilter_task_vperf_g} also demonstrates the significant throughput increases provided by RubiCL, compared to the standard library. At over $8$ times speed-up, combining subsequent \emph{Map} and \emph{Filter} tasks then dispatching the computation to the \ac{GPGPU} can speed up laptop computation greatly. At nearly $5$ times speed-up, and the proportional graph again showing no sign of plateau, the same tactic is also highly beneficial on the desktop system used for testing.
+Figure~\ref{fig:mfilter_task_vperf_g} also demonstrates the significant throughput increases provided by RubiCL, compared to the standard library. At over $8$ times speed-up, combining subsequent \emph{Map} and \emph{Filter} tasks then dispatching the computation to the \ac{GPU} can speed up laptop computation greatly. At nearly $5$ times speed-up, and the proportional graph again showing no sign of plateau, the same tactic is also highly beneficial on the desktop system used for testing.
 
-\ac{GPGPU} devices continue to dominate \ac{CPU} devices, as with other \emph{Filter} tasks. This occurs even though a \emph{Map} task, something that \ac{CPU} architecture excelled at earlier, has been prepended. It is possible that the simpler task performed earlier did not benefit from the improved device throughput, once the latency cost of context-switching computation was introduced.
+\ac{GPU} devices continue to dominate \ac{CPU} devices, as with other \emph{Filter} tasks. This occurs even though a \emph{Map} task, something that \ac{CPU} architecture excelled at earlier, has been prepended. It is possible that the simpler task performed earlier did not benefit from the improved device throughput, once the latency cost of context-switching computation was introduced.
 
 Comparison with a bespoke sequential solution in Figure~\ref{fig:mfilter_task_bperf_g} shows that a large proportion of tailored solution performance is obtained on both systems.
 The laptop system obtains, at best, $70\%$ performance and the desktop system obtains $50\%$ with further indications of increasing proportion on larger datasets.
@@ -327,9 +327,9 @@ A large failing of the project in this regard was the fact that benchmarking of 
 Programming error aside, the performance of the sort algorithm on the \ac{CPU} of both systems is unsurprisingly lacking.
 Although asymptotically identical in cost when performing \emph{compare-split} of values at sorting nodes, \emph{bitonic} sort requires much more work than the celebrated \emph{quicksort} algorithm. The increase in throughput provided by scheduling across many hardware threads of a \ac{CPU} was insufficient to offset having to perform a greater number of comparisons.
 
-It is more interesting to note that Figure~\ref{fig:sortpow_van_perf_g} shows when sorting an integer dataset using the laptop's \ac{GPGPU}, performance around $1.5$ times that of inbuilt \emph{quicksort} can be achieved. It's important to realise that this does not mean \ac{GPGPU} sorting will triumph over \emph{quicksort} in other domains, though more efficient \ac{GPGPU} sorting algorithms have been shown to provide significant speed-up over \ac{CPU} sorting\cite{sintorn2008fast}. However, it is more likely that in this case a combination of the lack of boxed variables within the RubiCL execution environment, combined with a still-strong sorting algorithm, resulted in the RubiCL implementation performing the task faster than the RubyVM could manage.
+It is more interesting to note that Figure~\ref{fig:sortpow_van_perf_g} shows when sorting an integer dataset using the laptop's \ac{GPU}, performance around $1.5$ times that of inbuilt \emph{quicksort} can be achieved. It's important to realise that this does not mean \ac{GPU} sorting will triumph over \emph{quicksort} in other domains, though more efficient \ac{GPU} sorting algorithms have been shown to provide significant speed-up over \ac{CPU} sorting\cite{sintorn2008fast}. However, it is more likely that in this case a combination of the lack of boxed variables within the RubiCL execution environment, combined with a still-strong sorting algorithm, resulted in the RubiCL implementation performing the task faster than the RubyVM could manage.
 
-For some reason, the performance of the desktop \ac{GPGPU} was not as strong as that of the laptop \ac{GPGPU}. This is disappointing and further work should look into why this is the case.
+For some reason, the performance of the desktop \ac{GPU} was not as strong as that of the laptop \ac{GPU}. This is disappointing and further work should look into why this is the case.
 \section{User evaluation}
 \paragraph*{Recap of the study performed}
 $7$ test-subjects were tasked with answering $5$ questions each. Answers to questions were obtained by querying $2$ datasets of $10,000,000$ elements each, with the assistance of the project's delivered library. This section presents the raw findings of the study, alongside interpretation and analysis.
@@ -371,7 +371,7 @@ In general, it was found that more-seasoned programmers completed the tasks soon
 
   \item There was no correlation between prior parallel programming ability and performance in the task. When questioned about levels of previous experience after the task, several participants stated they had no idea that the library was performing queries in parallel at all.
 
-  \item There was no correlation between prior \ac{GPGPU} programming experience and task performance. Again, when questioned, no participants were aware that execution was occurring on the laptop \ac{GPGPU}.
+  \item There was no correlation between prior \ac{GPU} programming experience and task performance. Again, when questioned, no participants were aware that execution was occurring on the laptop \ac{GPU}.
 
 \end{itemize}
 
@@ -379,7 +379,7 @@ In general, it was found that more-seasoned programmers completed the tasks soon
 Due to the questions being designed to only have one possible answering technique, all produced solutions took near-identical time to execute.
 Each question restarted the computation pipeline instead of carrying on, in order to keep answers distinct and easier to reason about.
 
-The mean time of execution, on the testing laptop's \ac{GPGPU}, for the produced solutions was $12.2$ seconds.
+The mean time of execution, on the testing laptop's \ac{GPU}, for the produced solutions was $12.2$ seconds.
 This compares favorably with the $49.5$ seconds required by an identical pure-ruby implementation, giving a speed-up factor of $4.06$.
 
 \section{Portability}
