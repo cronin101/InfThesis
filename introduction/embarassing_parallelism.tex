@@ -2,7 +2,7 @@
 Some problems are inherently parallel, containing no dependencies between subtasks. They can be dissected into a set of distinct work-units that can be executed concurrently.
 Such tasks are referred to as ``embarrassingly parallel''.
 
-Many \emph{functional programming} primitives, such as \verb|map|, are embarrassingly parallel, or parallelisable at some level of granularity.
+Many \emph{functional programming} primitives, such as \emph{Map}, are embarrassingly parallel, or parallelisable at some level of granularity.
 When transforming a dataset, any operation where the resultant state of each element in the output only depends on a single input can be easily scheduled across many compute units.
 
 \begin{figure}[h]

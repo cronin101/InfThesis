@@ -52,12 +52,15 @@ Other responsibilities include storing versioning metadata and selecting which a
 
 \paragraph*{Interface:}
 \begin{description}
-  \item[self.opencl\_device] Returns the current compute device. (Default: \verb|RubiCL::CPU|)
+  \item[self.opencl\_device] Returns the current compute device. (The default for this value is \verb|RubiCL::CPU|)
   \item[self.opencl\_device=(Device)] Sets the current compute device.
 \end{description}
 
   \item[CastAccess] A module designed to extend container types, providing the ability to initiate a computation pipeline.
-For example, the \verb|Array| built-in class is modified with \verb|Array.class_eval { include RubiCL::CastAccess }|.
+    For example, the Behaviour of the \verb|Array| built-in class is extended by mixing-in the module in the following manner:
+\begin{lstlisting}[language=Ruby]
+Array.class_eval { include RubiCL::CastAccess }
+\end{lstlisting}
 This allows parallel primitives performed on \verb|Arrays| to be executed by the compute device following an annotation, such as \verb|[1, 2, 3][Int]|.
 Upon casting, the actual conversion operations performed are specified by the target class. This module is decoupled from implementation and provides purely syntactic enhancements.
 
@@ -98,7 +101,7 @@ In order to prevent the \verb|Device| class becoming a \emph{god object}, manipu
 
 The manager also provides caching of the dataset to prevent unnecessary hardware retrieval if no operations have been performed.
 
-The ability to interact with an \ac{OpenCL} buffer is provided by the \verb|BufferBackend| native extension module.
+The manager's necessary ability to interact with an \ac{OpenCL} buffer is provided by the \verb|BufferBackend| native extension module.
 \paragraph*{Interface:}
 \begin{description}
   \item[load(type: Type, object: Object)] Makes the provided object addressable by the \ac{OpenCL} compute device.
