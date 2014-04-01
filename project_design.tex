@@ -72,4 +72,24 @@ The chosen execution style was to defer task requests and then execute optimised
 
 This mirrors the approach taken by many \emph{Object-Relational Mappers}, such as \verb|ActiveRecord|, combining a pipeline of queries into optimal SQL.
 
-The assumption was made that requiring multiple passes over the input dataset was significantly more expensive than the one-off code generation tasks. This was verified by timing information collected during empirical testing.
+The assumption was made that requiring multiple passes over the input dataset was significantly more expensive than the one-off code generation tasks. This was verified by timing information collected during empirical testing:
+
+\subsection{Construction and processing of tuple datasets}
+In order to allow a greater variety of query styles to be accelerated, it became clear that tuples should be introduced as a data-type. This necessitated the functionality to load a dataset of tuple elements onto the compute device and support of parallel queries possible on a standard dataset.
+
+After careful consideration of the requirements, two methods of achieving tuple support appeared suitable for the project.
+
+\paragraph*{Custom structures of data for each element} \ac{OpenCL} supports the usage of \verb|struct|s in kernel code. With this in mind, it would be possible to store each tuple continuously in memory and use member access to retrieve each slot. The size of each tuple structure can be used to guide memory management on the host. There are both advantages and disadvantages to this method of implementation. 
+
+An advantage of using structures is the ease of supporting arbitrary length tuples. The host code only knows about the size of each tuple, so that this information can be combined with the number of elements present when allocating the correct amount of device memory. The pre-compiled back-end code has no notion of tuple structure. Only the generated kernel code has the need to interact with slots within a tuple. As such, the structure definition can be generated dynamically at the same point as task definition. 
+
+One disadvantage of using structures is the need to recreate the entire dataset whenever tuples alter length. For example, if an array of 2-element tuples is loaded to the device, and a third slot is added to each, it is necessary to initialize a new buffer and fill it by copying existing values then inserting a new slot value for each tuple. This is the same issue faced when inserting an element within a fixed-size vector. This issue would result in increase cost of the \verb|zip| operator when creating or resizing tuples.
+
+\paragraph*{Virtual tuples stored in disjoint datasets}
+When processing tuples of length $2$, instead of creating a buffer storing tuples continuously in memory, two dataset buffers can be provided to each invoked kernel. The first buffer stores the first slot value for each tuple. Likewise, the second buffer stores all second slot values. The generated kernel code can then be designed to operate on tuples as intended, by accessing the indexed value from the buffer corresponding to the slot requested.
+
+This method has the advantage that creation and resizing of tuples is much less expensive. To create tuples, the second dataset, passed as a parameter to the zip operator, is simply provided to subsequent kernel invocations alongside the currently loaded buffer. When resizing tuples, the entire buffer does not need to be recreated because of a shift in individual tuple length. Instead, an extra buffer is passed to all scheduled kernels if the tuple has grown, or one buffer is released and is no longer shared if a slot has been removed.
+
+While this method benefits from greater performance, it is more involved to implement arbitrary sized tuples compared to the previously suggested solution. The host code is now concerned with many disjoint buffers that must be managed and released after use, and all required slots must be provided as kernel arguments prior to scheduling of any execution. In short, the host code is far more coupled to the currently loaded dataset's contents than is desirable.
+
+However, it is clear that the second solution, virtual tuples, achieves greater performance despite a more involved implementation. Therefore, it was chosen as the project's tuple implementation method. The initial implementation of tuples was limited to a $2$ slot maximum so that the design could be completed quickly and verified as correct, but it is entirely possible to expand the system to support arbitrary length tuples later.
