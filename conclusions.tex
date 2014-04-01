@@ -73,5 +73,5 @@ In addition, since the Topaz VM keeps track of the basic type of values within a
 
 \paragraph*{RubyGem deployment system}
 Currently, utilising the project's deliverable requires cloning the \emph{Git} repository, generating a \emph{Makefile}, and running \verb|$ make install| before the library can be included into a Ruby runtime.
-\emph{RubyGems}\cite{rubygems} is a hosting service for packaged libraries written for the Ruby language. The library container, referred to as a \emph{Gem} can handle building any native extensions that may be required.
+\emph{RubyGems}\cite{rubygems} is a hosting service for packaged libraries written for the Ruby language. The library container, referred to as a \emph{Gem}, handles building any native extensions that may be required.
 By packaging the RubiCL library as a Gem and then hosting it on RubyGems, installation would be as simple as \verb|$ gem install rubi_cl|. Then the library is available to be \verb|require|d by suitable code on the system. Making it trivial to install and subsequently outsource computation with the RubiCL library if important if many others can benefit from the project's increased calculation throughput.
