@@ -38,6 +38,16 @@ Within the project's development cycle, it was found that reuse of parallel prim
 
 
 \subsection{Applicability to a variety of platforms, avoiding over-tailing for a specific machine}
+The desktop system experienced task speed-up after utilising the project library to perform tasks. However, it did not perform as well as expected after witnessing the initial success of the development system. Specifically, $2$\textendash$4$ times speed-up of tasks was achieved, but this pales in comparison to the factors of $3.5$\textendash$9$ displayed during laptop benchmarking.
 
+More significantly, the number of dataset elements required for beneficial outsourcing of computation rose from tens of thousands to $2,000,000$\textendash$5,000,000$. It is likely that the greater task dispatch latency experienced on the desktop system, $300$ms as opposed to $50$ms, is to blame for the elevated lower-bound. Unfortunately, it is less clear what the cause for this increased delay is. It was expected that \ac{GPGPU} tasks would experience high latency, due to the need to transfer datasets over the \ac{PCI} bus. Yet, the delay was experienced by the \ac{CPU} device as well. After the issues faced correctly installing \ac{AMD} \ac{OpenCL} support on \emph{GNU/Linux}, it is possible that suboptimal driver performance may have some part to play. Nonetheless, this issue should be investigated further in order to increase the applicability of the project's deliverable on desktops.
+
+The rate of \ac{GPGPU} acceleration did seem like it could reach over $4$ times that of the standard implementation when filtering the larger datasets, as it showed no sign of plateauing on the performance graphs. Without further benchmarking it will be impossible to know whether this is the case.
+
+Another oddity experienced on the desktop system was the fact that sort task performance was lower on the \ac{GPGPU} then the \ac{CPU}. This is unexpected as the algorithm used was designed for massively parallel architectures at the expense of extra work. This hints that the hardware wasn't being utilised fully, but again only further research can determine what went wrong.
+
+Finally, it must be reiterated that it is currently quite involved to setup a working \emph{GNU/Linux} \ac{AMD} \ac{OpenCL} compute system. The need for proprietary drivers that do not play nicely with the default graphics tool-chain to be installed before tasks can be accelerated reduces the number of eligible systems significantly.
+
+With all the issues encountered, this goal experienced only partial success. Sizeable performance improvements were still provided for desktop system computation. However, they required a much larger dataset to offset the sizeable latency, and the system setup phase was harder than anticipated. Hopefully, installation issues will decrease over time as uptake increases.
 
 \section{Further work}
