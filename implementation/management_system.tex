@@ -18,8 +18,22 @@ Instead, it encodes the value of the first $2^{64 - 2}$ integers directly into t
 It can be deduced that a pointer with an odd value is not pointing to a valid memory location, as is true for any pointer that does not align to word-length boundaries. In this case, a flag lookup table can be used in order to determine the correct typing information.
 
 When dealing with tagged-pointers, the corresponding value of pointer \verb|p| can be retrieved with \verb|p >> 1|. To create a tagged-pointer, the value \verb|x| can be encoded with \verb?(x << 1) | 0x01 ?. The RubiCL project utilises this fact by transferring an array of \verb|VALUE| pointers directly to the compute-device, whenever annotation has suggested that all contained elements are of \verb|Fixnum| type. There, the bit-shifting conversions, present at either end of the computation pipeline, can be performed in parallel to increase throughput.
+
 \subsection{Transferring data to and from device}
-\todo{Explain this. Pinned memory vs writebuffer etc.}
+As \ac{OpenCL} is designed to provide an abstraction over specific hardware details, the memory management functionality it provides reflects this agnosticism.
+A common method for providing input data to a compute-device is to explicitly create a buffer of the required size, within the device's \emph{context}, and then enqueue a \verb|clWriteBuffer| task to fill it with any elements to process. This buffer object is then provided as a kernel parameter, prior to kernel invocation. To retrieve the processed elements, a \verb|clReadBuffer| task is enqueued.
+
+This workflow causes several issues. Firstly, when the compute-device selected is the system \ac{CPU}, unnecessary data copying occurs. The original location of the dataset is already addressable by the \ac{CPU} device so there is no need to move elements into a new buffer, this just causes unnecessary delay. The same is true when retrieving processed elements, there is no reason that the host program cannot access the element buffer directly. Secondly, when writing data into the device buffer, data-flow occurs through the host device. This is inefficient on many systems when interfacing with a \ac{GPU} device, since \emph{kernel-mode} execution is required to transfer data over the \ac{PCI} bus and \ac{OS}-enforced context switching increases latency.
+
+Luckily, the \ac{OpenCL} \ac{API} provides a solution that is better-suited to the project's data transfer needs.
+\emph{Pinned} buffers can be created by specifying the \verb|USE_HOST_PTR| flag and providing a pointer to the dataset residing within host memory.
+When a dataset is pinned, the returned buffer object now merely references the original data location, yet can still be provided as a kernel parameter.
+Upon providing a pinned buffer parameter, behaviour of the \ac{OpenCL} execution environment is dependent on the target device.
+When the kernel is scheduled for execution on the \ac{CPU}, no memory transfer occurs and the original data can be accessed through the reference provided within a pinned buffer.
+When the kernel is scheduled for execution on an external device, such as a \ac{GPU}, \ac{DMA} transfer of the dataset occurs and the elements are placed in device-local memory.
+Before the host program can access the results of kernel execution, the pinned buffer must be \emph{unmapped}. At this point is it now guaranteed that the host memory state will reflect the finishing state of compute-device computation.
+
+By utilising pinned memory, the RubiCL library avoids any unnecessary copying of data when executing on \ac{CPU} compute-devices. In addition, \ac{GPU} latency is reduced as \ac{DMA} transfer of the required dataset does not cause the \ac{OS} to invoke costly context-switching.
 
 \subsection{Function parser}
 The system's function parser is responsible for converting a supplied anonymous function into C syntax. The functionality of the parser is demonstrated in Listing~\ref{lst:parser_ex}
