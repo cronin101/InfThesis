@@ -119,5 +119,16 @@ In order to continue the project's goal of properly exploring the potential bene
 The system, consisting of an \ac{AMD} \emph{FX-4130} CPU and an \ac{AMD} \emph{R7 260X} \ac{GPU}, was ordered and assembled after the initial problems were encountered. This caused a slight stall in development. However, it was estimated that with hardware utilising a single, \ac{AMD} \ac{OpenCL} implementation, productivity would be vastly increased. Luckily, this replacement system was successful enough to make the delay worth experiencing.
 
 \section{Completed Work}
-\subsection{Features}
-\todo{Complete overview of what was done, brief but inclusive.}
+The produced deliverable is a library for outsourcing computation on homogenous datasets to the \ac{CPU} or \ac{GPU}. The complete list of functionality provided is documented in the \emph{Software Architecture} section of the \emph{Design} chapter.
+
+As a basic metric of the amount of work involved, the size of the produced codebase is follows (as reported by \verb|cloc|):
+
+\begin{description}
+  \item[Management system] $31$ Ruby files, each implementing a single class or module, with a total of $1571$ \ac{LoC}.
+
+  \item[Back-end library] $3$ C files, providing the ability, given a suitable kernel, to dispatch all implemented parallel tasks on hardware devices via the \ac{OpenCL} library, a total of $1226$ \ac{LoC}.
+
+  \item[Native extension] $1$ C file, containing $563$ \ac{LoC}, enabling the Ruby runtime to perform parallel tasks by orchestrating the use of primitives defined in the back-end. Also contains a $16$ \ac{LoC} Ruby file that generates the $201$ \ac{LoC} \verb|Makefile| needed to build the project.
+
+  \item[Test suite] $19$ Ruby files, written using the \verb|RSpec| library, ensuring system correctness by performing a comprehensive set of tests. $566$ \ac{LoC} in total.
+  \end{description}
