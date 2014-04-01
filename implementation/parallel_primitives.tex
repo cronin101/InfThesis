@@ -208,7 +208,6 @@ This discovery suggests that it is possible to increase the throughput of \verb|
 In fact, the kernel and calling algorithm utilised differs from \emph{odd-even} scan in that it is designed to perform better on typical \ac{OpenCL} compute devices.
 
 It was adapted from an example provided within the Apple \ac{OpenCL} SDK, modified to allow arbitrary element types and operate on buffers within the RubiCL environment.
-\todo{Explain bank conflicts and mitigating their effects?}
 
 \subsection{Scatter}
 The \verb|Scatter| primitives receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
@@ -436,4 +435,8 @@ Further work can include replacing this suboptimal lack of specialisation with a
 
 
 \subsection{Sort}
-\todo{Explain bitonic sort}
+The project's sorting capability is provided by parallel \emph{bitonic mergesort}. Bitonic sorting utilises a sorting network of comparators to gradually produce a monotonically sorted result from stages of increasing length bitonic sequences.
+
+A simple implementation of bitonic mergesort, whereby single elements are compared and possibly swapped at each gate, can sort an input sequence of length $n$ with $O(n \log^2 n)$ cost. This is not cost-optimal as sequential sorting algorithms can perform the task in $O(n \log n)$ comparisons. However, sorting network based algorithms are suitable for \ac{SIMD} execution as the same sequence of comparisons will always occur, independent of the input elements' values.
+
+The bitonic mergesort kernel, generated and dispatched for all RubiCL's \verb|sort| tasks, was adapted from sample code for sorting provided within the \ac{AMD} APP SKD.

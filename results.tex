@@ -325,7 +325,9 @@ The flaw present stems from an inefficient method of padding and unpadding the d
 A large failing of the project in this regard was the fact that benchmarking of the sorting algorithm overlooked using non-power-of-two datasets. Due to the convenience of raising $2$ to a range of powers using the \verb|map| function, this method was used to generate seed sizes within the frequently used benchmarking scripts. Figure~\ref{fig:sortpow_task_runtime_g} shows that for power-of-two datasets, sort performance is not hindered. Therefore, the inefficiency was understandably missed.
 
 Programming error aside, the performance of the sort algorithm on the \ac{CPU} of both systems is unsurprisingly lacking.
-Although asymptotically identical in cost when performing \emph{compare-split} of values at sorting nodes, \emph{bitonic} sort requires much more work than the celebrated \emph{quicksort} algorithm. The increase in throughput provided by scheduling across many hardware threads of a \ac{CPU} was insufficient to offset having to perform a greater number of comparisons.
+The \emph{compare-swap} bitonic sort algorithm used by RubiCL to perform sort tasks has $O(n \log^2 n)$ cost, greater than that of average-case \emph{quicksort}.
+In addition, \emph{quicksort} is particularly celebrated for minimising the number of comparisons necessary to sort a dataset, resulting in far less work than \emph{bitonic mergesort}.
+The increase in throughput provided by scheduling across many hardware threads of a \ac{CPU} was insufficient to offset having to perform a greater number of comparisons.
 
 It is more interesting to note that Figure~\ref{fig:sortpow_van_perf_g} shows when sorting an integer dataset using the laptop's \ac{GPU}, performance around $1.5$ times that of inbuilt \emph{quicksort} can be achieved. It's important to realise that this does not mean \ac{GPU} sorting will triumph over \emph{quicksort} in other domains, though more efficient \ac{GPU} sorting algorithms have been shown to provide significant speed-up over \ac{CPU} sorting\cite{sintorn2008fast}. However, it is more likely that in this case a combination of the lack of boxed variables within the RubiCL execution environment, combined with a still-strong sorting algorithm, resulted in the RubiCL implementation performing the task faster than the RubyVM could manage.
 
@@ -383,4 +385,16 @@ The mean time of execution, on the testing laptop's \ac{GPU}, for the produced s
 This compares favorably with the $49.5$ seconds required by an identical pure-ruby implementation, giving a speed-up factor of $4.06$.
 
 \section{Portability}
-\todo{Write about installation on desktop system (including all the pain of proprietary \ac{AMD} drivers).}
+As mentioned during the \emph{Introduction} chapter, \ac{OpenCL} is still harder to utilise on some systems than the corresponding hardware vendors would have you believe.
+
+On Apple hardware, such as the laptop used for development, achieving a working system is trivial.
+The system comes with all dependencies for \ac{OpenCL} \ac{GPGPU}. Utilising the library is as simple as remembering to include the correct header location. For some reason Apple decided that it should live at \verb|<OpenCL/opencl.h>|, while every other \ac{OS} presents the \ac{OpenCL} header at \verb|<CL/cl.h>|.
+
+On the \ac{AMD} desktop system, operating \emph{Arch Linux}, installation of a complete set of working \ac{OpenCL} components was quite a bit more involved.
+The \ac{OpenCL} framework uses a system, called \ac{ICD}, to allow many vendor-specific implementations of the library to be loaded on a single machine simultaneously.
+
+Unfortunately, the root, vendor agnostic, \ac{ICD} loader is out of date in the \emph{Arch Linux} repositories, with only \ac{OpenCL} $1.1$ support. Luckily, it was possible to build \verb|libopencl|, provided by \ac{AMD}, from source and install the \ac{ICD} loader correctly.
+Once the loader was installed, obtaining the actual \ac{ICD} component was straightforward. It is contained within the \ac{AMD} APP SDK, available in the \ac{AUR}.
+However, the AMD APP SDK only provides \ac{CPU} drivers for \ac{OpenCL} execution. Furthermore, the default, \emph{free} \ac{AMD} display drivers do not allow \ac{OpenCL} access to onboard \ac{GPU} devices. The solution is to install the proprietary \verb|catalyst-utils| package, again from the \ac{AUR}. This provides required kernel modules for \ac{AMD} \ac{GPU} utilisation.
+
+The final remaining issue is that \verb|catalyst-utils| only supports a significantly out of date version of \verb|xorg-server|. This could cause issues in a system used for daily activities, as dependency clashes could leave the user having to choose between \ac{OpenCL} support and the ability to run recently-developed desktop software.

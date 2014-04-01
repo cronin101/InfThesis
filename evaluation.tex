@@ -48,12 +48,24 @@ The range of primitives shortlisted for investigation were as follows:
 Two systems were used for running tests, the \emph{MacBook} laptop used primarily for development and the ordered \ac{AMD} desktop system.
 With library development and regular testing occurring primarily on the laptop, the benchmarking procedure provided an opportunity to evaluate how portable the performance characteristics of the \ac{OpenCL} framework are.
 
-\todo{Specs etc}
+The specification of the development laptop was as follows:
+\begin{description}
+  \item[APU] 1.7 GHz Intel \emph{Core i7 Haswell} with Intel HD5000 Graphics
+  \item[RAM] 8GB 1600Mhz DDR3
+\end{description}
+
+The specification of the desktop system, used for performance testing, was as follows:
+\begin{description}
+  \item[CPU] AMD \emph{FX-4120}
+  \item[GPU] AMD \emph{R7 260X}
+  \item[RAM] 16GB 1600Mhz DDR3
+\end{description}
+
 \subsubsection{Software}
 For both hardware systems, several methods of performing each specified task were measured:
 \begin{itemize}
     \item The standard implementation provided by unmodified Ruby $2.2$.
-    \item A handwritten native extension that performs the task using the optimal sequential method. (Listing\ref{lst:bespoke_c})
+    \item A handwritten native extension that performs the task using the optimal sequential method. (Listing~\ref{lst:bespoke_c})
     \item The RubiCL library performing the task, executing on the system \ac{CPU}.
     \item The RubiCL library performing the task, executing on the system \ac{GPU}.
 \end{itemize}
