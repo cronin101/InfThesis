@@ -1,10 +1,10 @@
 \subsection{Data.Array.Accelerate}
 
-Data.Array.Accelerate is a Haskell project\cite{daa}, and accompanying library\cite{daalib}, providing massive parallelism to idiomatic Haskell code. It aims to approach the performance of `raw' \ac{CUDA} implementations, utilising handwritten kernels.
+Data.Array.Accelerate is a Haskell project\cite{daa}, and accompanying library\cite{daalib}, providing massive parallelism to idiomatic Haskell code. It aims to approach the performance of `raw' \ac{CUDA} implementations, that utilise handwritten kernels.
 
 The library introduces new types for compute containers. Built-in types are wrapped prior to inclusion in any computation. This allows the runtime to gather information about which datasets need to be transferred to compute-devices, and how to structure them in device memory.
 
-It has received some significant optimisations\cite{daaopt} that target the inefficiencies present when an unnecessarily large number of kernels would be generated and executed, due to composition of functions.
+It has received some significant optimisations\cite{daaopt} that target the inefficiencies present when an unnecessarily large number of kernels would be generated and executed, due to the composition of functions.
 
 \paragraph*{Divergences}
 A disadvantage of relying on Data.Array.Accelerate for general-purpose computation is the relative difficulty often associated with becoming a competent Haskell programmer. The language diverges greatly from many mainstream languages.  It requires programmers to state calculations in purely functional form.

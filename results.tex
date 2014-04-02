@@ -2,7 +2,6 @@
 \chapter{Results}
 
 \section{Benchmarks}
-\newpage
 \subsection{Map tasks}
 \subsubsection{Integer performance}
 \begin{figure}[H]
@@ -11,16 +10,19 @@
   \caption{Task duration by execution target for \emph{Map}.}
   \label{fig:map_task_runtime_g}
 
+\end{figure}
+\begin{figure}[H]
+  \centering
+
   \includegraphics[width=\textwidth]{./graphing/just_map/per_element.pdf}
   \caption{Task duration per processed element for \emph{Map}.}
   \label{fig:map_task_per_el_g}
 
-\end{figure}
-\begin{figure}[H]
-  \centering
   \includegraphics[width=\textwidth]{./graphing/just_map/prop_van.pdf}
   \caption{Proportion of vanilla Ruby performance achieved for \emph{Map}.}
   \label{fig:map_task_vperf_g}
+\end{figure}
+\begin{figure}[H]
 
   \includegraphics[width=\textwidth]{./graphing/just_map/prop_bes.pdf}
   \caption{Proportion of bespoke C extension performance achieved for \emph{Map}.}
