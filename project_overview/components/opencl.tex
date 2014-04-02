@@ -27,9 +27,9 @@ As Figure~\ref{fig:ocl_model} illustrates, the architecture model presented by \
 \begin{description}
 \item[Host device] The system's \ac{CPU}. It interacts with the execution environment and is responsible for discovering and selecting compute-devices present on the system. The host device initialises one or more \emph{contexts}, whereby any devices within a single context have access to shared task and memory buffers.
 
-\item[Compute devices] The system's available processing devices, capable of scheduling \ac{OpenCL} kernel work-groups. Before enumerating compute-devices, the available \emph{platforms} must be discovered by the runtime. Usually, there is a platform presented for each unique \ac{OpenCL} supporting vendor with hardware installed. Devices are then retrieved on a per-platform basis, either filtered by type (\ac{CPU}/\ac{GPU}) or not.
+\item[Compute-devices] The system's available processing devices, capable of scheduling \ac{OpenCL} kernel work-groups. Before enumerating compute-devices, the available \emph{platforms} must be discovered by the runtime. Usually, there is a platform presented for each unique \ac{OpenCL} supporting vendor with hardware installed. Devices are then retrieved on a per-platform basis, either filtered by type (\ac{CPU}/\ac{GPU}) or not.
 
-\item[Compute Units] Discrete units of hardware present within a processing devices, capable of scheduling and executing \ac{OpenCL} kernel instances.
+\item[Compute-units] Discrete units of hardware present within a processing devices, capable of scheduling and executing \ac{OpenCL} kernel instances.
 Kernel execution occurs across internal \emph{processing units}, such as \acp{ALU}.
 \end{description}
 
