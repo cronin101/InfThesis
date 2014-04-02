@@ -12,10 +12,8 @@
 \usepackage{verbatim}
 \usepackage{rotating}
 
-\usepackage[disable]{todonotes}
-\let\oldtodo\todo
-\renewcommand\todo[1]{\oldtodo[size=\tiny]{#1}}
-\setlength{\marginparwidth}{2cm}
+%\usepackage[disable]{todonotes}
+%\setlength{\marginparwidth}{2cm}
 
 \usepackage{algpseudocode}
 \usepackage{algorithm}
@@ -25,7 +23,7 @@
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage[T1]{fontenc}
-\usepackage[scaled]{beramono}
+%\usepackage[scaled]{beramono}
 \newcommand\Small{\fontsize{9}{9.2}\selectfont}
 \newcommand*\LSTfont{\Small\ttfamily\SetTracking{encoding=*}{-60}\lsstyle}
 
@@ -34,7 +32,8 @@
 \usepackage{float}
 %\usepackage{helvet}
 \usepackage{fontspec}
-\setsansfont[Ligatures=TeX]{Helvetica}
-\setmainfont[Ligatures=TeX]{Helvetica}
-\setmonofont[Scale=0.9]{Menlo}
+%\RequirePackage{fix-cm}
+\setsansfont[Scale=0.8, Ligatures=TeX]{Helvetica}
+\setmainfont[Scale=0.8, Ligatures=TeX]{Helvetica}
+\setmonofont[Scale=0.7]{Menlo}
 %\renewcommand{\familydefault}{\sfdefault}
