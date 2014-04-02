@@ -1,7 +1,7 @@
 \section{Management System}
 
 \subsection{Converting between Ruby and C objects}
-One important issue to overcome when designing an library to accelerate Ruby processing, is the fact that the RubyVM stores all raw values within \emph{objects}, in a manner that is very different from C.
+One important issue to overcome, when designing an library to accelerate Ruby processing, is the fact that the RubyVM stores all raw values within \emph{objects}, in a manner that is very different from C.
 
 Internally, the RubyVM's C implementation references all objects as of type \verb|VALUE|. This value-type is a slight misnomer as it (usually) contains a pointer to an object structure.
 
@@ -11,13 +11,13 @@ There are several object structures used to represent raw data within the RubyVM
      \item A specialised object representation, used to increase performance of heavily utilised object types. Examples include \verb|RString|, \verb|RFloat|, and \verb|RArray|.
 \end{itemize}
 
-The first member of both structures is another structure called \verb|RBasic|. This contains meta-data about the object, such as what type it is. Therefore, it is possible to obtain the typing information of any object designated by a \verb|VALUE|, by examining the meta-data present in its first structure member.
+The first member of both aforementioned structures is another structure called \verb|RBasic|. This contains meta-data about the object, such as what type it is. Therefore, it is possible to obtain the typing information of any object designated by a \verb|VALUE|, by examining the meta-data present in its first structure member.
 
 Since integers are often heavily utilised within computer programs, and often short-lived, the standard RubyVM implementation avoids the creation of integer objects in order to improve performance.
 Instead, it encodes the value of the first $2^{64 - 2}$ integers directly into the \verb|VALUE| `pointer', setting the final 2 bits as the flag \verb|0x01|.
 It can be deduced that a pointer with an odd value is not pointing to a valid memory location, as is true for any pointer that does not align to the machine's word-length boundaries. In this case, a flag lookup table can be used in order to determine the correct typing information.
 
-When dealing with tagged-pointers, the corresponding value of pointer \verb|p| can be retrieved with \verb|p >> 1|. To create a tagged-pointer, the value \verb|x| can be encoded with \verb?(x << 1) | 0x01 ?. The RubiCL project exploits this fact by transferring an array of \verb|VALUE| pointers directly to the compute-device, whenever annotation has suggested that all contained elements are of \verb|Fixnum| type. There, the bit-shifting conversions, present at either end of the computation pipeline, can be performed in parallel to increase throughput.
+When dealing with tagged-pointers, the corresponding value of pointer \verb|p| can be retrieved with \verb|p >> 1|. To create a tagged-pointer, the value \verb|x| can be encoded with \verb?(x << 1) | 0x01 ?. The RubiCL project exploits this fact by transferring an array of \verb|VALUE| pointers directly to the compute-device, whenever annotation has suggested that all contained elements are of \verb|Fixnum| type. There, the bit-shifting conversions, present at either end of the computation pipeline, can be performed in parallel in order to increase throughput.
 
 \subsection{Transferring data to and from the compute-device}
 As \ac{OpenCL} is designed to provide an abstraction over specific hardware details, the memory management functionality it provides reflects this agnosticism.
@@ -177,9 +177,9 @@ There is a well-defined algorithm for doing so, provided in Algorithm~\ref{alg:t
 The conversion algorithm makes the assumption that all non-literals are functions with arity 2. This is justified since it covers all mathematical operators required by the library. Outliers include unary negation and method sending operations. These are detected and handled by an additional level of logic, omitted from the basic algorithm for brevity.
 
 \paragraph*{Handling conditionals}
-Conditional operators, such as \verb|&&|, complicate the reconstruction process. Instead of modifying the value of a stack-machine, they may perform a branch. Whether or not this occurs depends on the \verb|truthyness| of the current value. This is caused by the optimisation of short-circuiting boolean calculations.
+Conditional operators, such as \verb|&&|, complicate the reconstruction process. Instead of modifying the value of a stack-machine, they may perform a branch. Whether or not this occurs depends on the \emph{truthyness} of the current value. This is caused by the optimisation of short-circuiting boolean calculations.
 
-Luckily, at the point that the branch is possibly triggered, no further operators can mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply abandoning the current expression, ending in a conditional, and starting a new stack. All expressions produced are then just combined in order after the token stream has been exhausted.
+Luckily, at the point that the branch is possibly triggered, no further operators can mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply abandoning the current expression ending in a conditional, and starting a new stack. All expressions produced are then just combined in order after the token stream has been exhausted.
 
 \subsection{Task queue}
 The \verb|TaskQueue| management system buffers all deferred tasks, scheduled during the computation pipeline. It is responsible for detecting potential optimisations and applying them prior to dispatch.
@@ -189,7 +189,7 @@ In the order presented, the types of fusion supported are as follows:
 \begin{description}
 \item[Map-map fusion] Adjacent \verb|map| tasks can be replaced by a single task that performs the side-effects of both tasks combined.
 
-\item[Filter-filter fusion] Adjacent \verb|filter| tasks can be replaced by a single task that only retains elements that pass both predicates.
+\item[Filter-filter fusion] Adjacent \verb|filter| tasks can be replaced by a single task that only retains elements passing both predicates.
 
 \item[Map-filter fusion] A \verb|filter| task following a \verb|map| task can replace it, performing its mutation before generating presence flags. Filter tasks that have gained the additional responsibility to mutate are hereafter referred to as \verb|mapfilter| tasks.
 

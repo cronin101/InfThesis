@@ -100,7 +100,7 @@ The RubiCL library offers a speed-up of around $2$ times the traditional impleme
   \label{fig:dfilter_task_bperf_g}
 \end{figure}
 \paragraph*{Recap of operation performed}
-The dense \emph{Filter} task performed was the equivalent of \verb!#select { |x| x.even? }!. With the ascending range of data supplied, this will return a subset of the input dataset with half the number of elements.
+The dense \emph{Filter} task performed was the equivalent of \verb!#select { |x| x.even? }!. With the ascending range of data supplied, this will return a subset of the input dataset with half the number of elements remaining.
 
 \paragraph*{Observations and analysis}
 Figure~\ref{fig:dfilter_task_runtime_g} is less cluttered than the corresponding graph for \emph{Map} tasks, as there is more variation between the performance of dense \emph{Filter} implementations.
@@ -110,7 +110,7 @@ Further unlike \emph{Map} tasks, on both systems the \ac{GPU} compute-devices ou
 
 On the laptop system, Figure~\ref{fig:dfilter_task_vperf_g} demonstrates that the library is beneficial when processing all datasets within the tested range. The desktop is not quite as successful at performing dense purely-\emph{Filter} tasks, hampered when producing subsets of smaller datasets by its increased latency. At least $5$ million elements are required before it is worthwhile to offload computation onto the \ac{GPU} via RubiCL. The \ac{CPU} trails not long after, at $8$ million elements, but never achieves more than $25\%$ speed-up over the standard Ruby implementation.
 
-On both test systems, when using the \ac{GPU}, noticeable speed-up of \emph{Filter} operations can be achieved. With a $2.5$ times speed-up on the desktop and over $3.5$ times on the laptop, large filtering operations are significantly accelerated by the RubiCL library.
+On both test systems, when using the \ac{GPU}, a noticeable speed-up of \emph{Filter} operations can be achieved. With a $2.5$ times speed-up on the desktop and over $3.5$ times on the laptop, large filtering operations are significantly accelerated by the RubiCL library.
 
 Figure~\ref{fig:dfilter_task_bperf_g} shows that the laptop \ac{GPU} achieves a high proportion, peaking at $75\%$, of bespoke sequential code performance. The desktop system boasts a lesser proportion, at $50\%$, but the lack of plateau in the figure suggests that this gap would close further as datasets increase in size.
 
@@ -188,7 +188,7 @@ The bespoke extension performs much better comparatively at sparse filtering tha
 With this in mind, Figure~\ref{fig:sfilter_task_bperf_g} shows a decrease in performance of RubiCL relative to bespoke filtering, compared to the denser predicate examined earlier.
 
 The inverse is true in Figure~\ref{fig:sfilter_task_vperf_g}, with RubiCL demonstrating an improved $3$\textendash$5$ times speed-up when executing on \ac{GPU} devices over Ruby $2.2$ for dense filtering.
-The differences in relative performance between dense and sparse \emph{Filter} task implementations suggest that the cause for diverging ratios may result from there being fewer conditional insertions to the result vector. Alternatively, when less data is returned from a compute-device, less time is spent proportionally in the comparatively slow operation of cross-device data transfer compared to the quick action of filtering itself.
+The differences in relative performance between dense and sparse \emph{Filter} task implementations suggest that the cause for diverging ratios may result from there being fewer conditional insertions to the result vector. Alternatively, when less data is returned from a compute-device, less time is spent, proportionally, in the comparatively slow operation of cross-device data transfer compared to the quick action of filtering itself.
 
 \paragraph*{Smaller scale sparse Filter tasks}
 \begin{figure}[H]
@@ -366,7 +366,7 @@ In general, it was found that more-seasoned programmers completed the tasks soon
 
   \item Experienced programmers were more likely to state filtering predicates over several distinct pipeline stages, citing ease of readability as a motivating factor. This demonstrates the need to support \emph{task-fusion} within a pipeline-based execution environment. Otherwise, there would be an unnecessary penalty associated with orchestrating queries this way.
 
-  \item There was confusion as to how zipping was achieved in the library, again this was particularly prevalent among experienced Ruby programmers. This was due to them attempting to zip datasets after both had been annotated, despite the documentation stating that only the first dataset needs to annotated and not the method argument. This was less common with subjects inexperienced with Ruby as they read the documentation first. This suggests that, in further work, the \verb|zip| method should be revisited and perhaps redesigned to be more explicit in usage.
+  \item There was confusion as to how zipping was achieved in the library, again this was particularly prevalent among experienced Ruby programmers. This was manifested as them attempting to zip datasets after both had been annotated, despite the documentation stating that only the first dataset needs to annotated and not the method argument. This was less common with subjects inexperienced with Ruby as they read the documentation first. This suggests that, in further work, the \verb|zip| method should be revisited and perhaps redesigned to be more explicit in usage.
 
   \item  When typos were made within parsed anonymous functions, subjects understood the error message provided. This occurred despite it mentioning ``method sending not implemented for \verb|$VARIABLE_NAME|'' whenever incorrectly written bound variable were interpreted as a function invocation request.
 
@@ -385,13 +385,13 @@ Due to the questions being designed to only have one possible answering techniqu
 Each question restarted the computation pipeline instead of carrying on, in order to keep answers distinct and easier to reason about.
 
 The mean time of execution, on the testing laptop's \ac{GPU}, for the produced solutions was $12.2$ seconds.
-This compares favorably with the $49.5$ seconds required by an identical pure-ruby implementation, giving a speed-up factor of $4.06$.
+This compares favorably with the $49.5$ seconds required by an identical pure-Ruby implementation, giving a speed-up factor of $4.06$.
 
 \section{Portability}
 As mentioned during the \emph{Introduction} chapter, \ac{OpenCL} is still harder to utilise on some systems than the corresponding hardware vendors would have you believe.
 
 On Apple hardware, such as the laptop used for development, achieving a working system is trivial.
-The system comes with all dependencies for \ac{OpenCL} \ac{GPGPU}. Utilising the library is as simple as remembering to include the correct header location. For some reason Apple decided that it should live at \verb|<OpenCL/opencl.h>|, while every other \ac{OS} presents the \ac{OpenCL} header at \verb|<CL/cl.h>|.
+The system comes with all dependencies required for \ac{OpenCL} \ac{GPGPU}. Utilising the library is as simple as remembering to include the correct header location. For some reason Apple decided that it should live at \verb|<OpenCL/opencl.h>|, while every other \ac{OS} presents the \ac{OpenCL} header at \verb|<CL/cl.h>|.
 
 On the \ac{AMD} desktop system, operating \emph{Arch Linux}, installation of a complete set of working \ac{OpenCL} components was quite a bit more involved.
 The \ac{OpenCL} framework uses a system, called \ac{ICD}, to allow many vendor-specific implementations of the library to be loaded on a single machine simultaneously.

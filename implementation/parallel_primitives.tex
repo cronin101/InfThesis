@@ -107,7 +107,7 @@ After benchmarking the execution time of the kernels presented in Algorithms \re
 Influenced by these findings, the decision was made to use Algorithm~\ref{alg:oclmap} for \verb|map| tasks. This is due to the design being conceptually simpler, and therefore choosing the most basic solution that works well.
 
 \subsection{Scan}
-It is easier to explain the operation of the \verb|scan| primitive after explanation of \verb|Reduce| has been given.
+It is easier to explain the operation of the \verb|scan| primitive after an explanation of \verb|Reduce| has been given.
 \verb|Reduce| is a higher-order function that takes an array and an initial `result' value (usually an identity value) and then repeatedly applies a combining function to produce an output.
 
 The final result is equivalent to repeatedly updating the initial value with the output of itself and the next set member using the combiner. Using this technique, the input array is consumed once while the result is cumulatively generated. Any associative reduction function can be parallelised to increase throughput.
@@ -431,7 +431,7 @@ Further work can include replacing this suboptimal lack of specialisation with a
 
 
 \subsection{Sort}
-The project's sorting capability is provided by parallel \emph{bitonic mergesort}. Bitonic sorting utilises a sorting network of comparators to gradually produce a monotonically sorted result from stages of increasing length bitonic sequences.
+The project's sorting capability is provided by parallel \emph{bitonic mergesort}. Bitonic sorting utilises a sorting network of comparators to gradually produce a monotonically sorted result, from stages of increasing length bitonic sequences.
 
 A simple implementation of bitonic mergesort, whereby single elements are compared and possibly swapped at each gate, can sort an input sequence of length $n$ with $O(n \log^2 n)$ cost. This is not cost-optimal as sequential sorting algorithms can perform the task in $O(n \log n)$ comparisons. However, sorting network based algorithms are suitable for \ac{SIMD} execution as the same sequence of comparisons will always occur, independent of the input elements' values.
 

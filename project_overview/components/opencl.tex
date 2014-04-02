@@ -42,7 +42,7 @@ Kernel execution occurs across internal \emph{processing units}, such as \acp{AL
 \paragraph*{Execution Model}
 \ac{OpenCL} has a simple execution model, allowing both \emph{coarse-grained} and \emph{fine-grained} parallelism. Programmers write parallel code from the reference frame of a single kernel execution. Each instance orients itself only through access to its \emph{local} and \emph{global} \verb|id|, expanded on shortly. Larger calculations are a direct result of cooperating kernel instances. 
 
-Kernel instances, scheduled for execution on compute-devices, as referred to as \emph{work-items}.
+Kernel instances, scheduled for execution on compute-devices, are referred to as \emph{work-items}.
 
 The \ac{OpenCL} standard calls a collection of work-items a \emph{work-group}. Work-groups are the unit of work dispatched to a device. The number of work-items within a group is set by the programmer, providing the \verb|global_work_size| parameter. Each kernel invocation is enumerated with a global \verb|id|. 
 
@@ -66,7 +66,7 @@ During the planning phase, RubiCL considered both choices. Ultimately, the decis
 
   \item[CPU and GPU execution]
     By using \ac{OpenCL}, RubiCL will be able to execute kernels on both \ac{CPU} and \ac{GPU} devices. This contrasts the \ac{GPU}-only focus of \ac{CUDA}.
-    This greatly increases development convenience. Development can occur on a mobile laptop, functionally tested with its \ac{CPU}. Afterwards, the library will be transferred to desktop workstations for performance testing on a variety of hardware.
+    This greatly increases development convenience. Development can occur on a mobile laptop, functionally tested with its \ac{CPU}. Afterwards, the library can be transferred to desktop workstations for performance testing on a variety of hardware.
 
     In addition, this opens up the possibility of attempting code execution on both devices concurrently. This will investigate whether complete system-wide utilisation is beneficial for a single computation.
   \end{description}
@@ -81,6 +81,6 @@ During the planning phase, RubiCL considered both choices. Ultimately, the decis
 
   Intel are up-to-date with library implementations but only have full non-Windows support if you have purchased non-consumer grade \emph{Xeon} processors.
 
-  Hopefully these issues will be rectified if \ac{OpenCL} continues to gain traction in future. As a short term response, the RubiCL project has been implemented on well-supported hardware only: An Apple \emph{Macbook Air} containing a Intel \emph{Haswell} \ac{APU}, and a desktop system containing an \ac{AMD} \ac{CPU} and \ac{GPU}.
+  Hopefully these issues will be rectified if \ac{OpenCL} continues to gain traction in the future. As a short term response, the RubiCL project has been implemented on well-supported hardware only: An Apple \emph{Macbook Air} containing an Intel \emph{Haswell} \ac{APU}, and a desktop system containing an \ac{AMD} \ac{CPU} and \ac{GPU}.
 
   Apple and \ac{AMD} both have high-quality \ac{OpenCL} $1.2$ libraries and seem to be the two companies most invested in increased \ac{OpenCL} uptake. Apple have recently started encouraging desktop software developers to schedule suitable tasks on the \ac{GPU} via OS X's \ac{GCD}.

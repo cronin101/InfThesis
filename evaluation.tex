@@ -9,7 +9,7 @@ The results of individual evaluation procedures will be presented in the \emph{R
 \begin{description}
 \item[Improving Ruby language performance when executing tasks on datasets]
 In order to investigate whether exploitable performance improvements are given by the completed project, a series of scenario-driven benchmarks were constructed.
-The library was then utilised to perform these scenarios and execution duration was compared to competing solutions: Standard Ruby code, and bespoke native extensions developed solely to achieve the evaluated task.
+The library was then utilised to perform these scenarios and execution duration was compared to competing solutions: standard Ruby code, and bespoke native extensions developed solely to achieve the evaluated task.
 Further discussion of all benchmarking will be presented in the \emph{Benchmarking} subsection.
 \item[Increasing the scale of \ac{REPL} experimentation possible]
 This goal depends on favourable results in the previous evaluation criteria, as improved performance should lead to better \ac{REPL} response time. However, unlike the previous benchmark's contenders, there is no longer a need to consider bespoke low-level solutions. This is due to the assumption that not all code is written upfront when investigating data using a \ac{REPL}. As such, someone employed to analyse and draw conclusions from a dataset may not have the skill-set required to produce low-level code on demand.
@@ -106,7 +106,7 @@ This will be followed by a brief analysis of how performance differs when presen
 \subsubsection{Gathering results}
 In order to speed up the process of gathering many benchmark results, a simple utility was produced. Listing~\ref{lst:bm_helper} shows the internals of the \emph{benchmark helper} utility.
 
-Since Ruby is a language that provides automatic memory management and garbage collection of objects, this must be disabled when benchmarking. Otherwise, the large number of repeated tests may trigger a sudden stop-the-world sweep during the latter timing rounds and skew the results.
+Since Ruby is a language that provides automatic memory management and garbage collection of objects, these features must be disabled when benchmarking. Otherwise, the large number of repeated tests may trigger a sudden stop-the-world sweep during the latter timing rounds and skew the results.
 
 To ensure that the results gathered represented average use effectively, each benchmark, at a particular dataset size,  was run $20$ times. Task execution duration was recorded over all repetitions, the mean of which was then returned. This lessens the weighting of anomalous readings, when the system's external utilisation may have reduced performance slightly.
 \lstinputlisting[
@@ -134,7 +134,7 @@ This was unrealised for a significant portion of the project's implementation ph
 \section{User Evaluation}
 \subsection{Subjects}
 The user evaluation procedure was designed to both showcase the potential of the project, when applied to a realistic scenario, and highlight any usability issues of the library.
-7 applicants were recruited for a 5 question challenge, using RubiCL to answer questions about a dataset.
+$7$ applicants were recruited for a $5$ question challenge, using RubiCL to answer questions about a dataset.
 
 The fictitious scenario presented was that of an online banking service with two separately stored datasets, corresponding to the triggering \verb|user_id| and transfer \verb|amount| of the past $10$ million transactions. Subjects had to utilise higher-order primitives to summarise activity presented in the data, under the guise of investigating a suspicious user.
 
@@ -143,7 +143,7 @@ As such, the range of applicable skills present in users evaluated ranged from h
 
 \subsection{Method}
 Before testing began, each test-subject was shown a quick demonstration of the project's capabilities, alongside a discussion about the research goal.
-The aim of this quick demonstration was to hint at how the library may be applied to the later provided problems, in addition to an introduction or refresher to Ruby syntax for higher-order functions. After the demonstration concluded, a link\cite{user_test_hints} containing brief \ac{API} documentation was provided. The majority of documentation was lifted directly from the Ruby documentation source, as the library mirrors the \verb|Enumerable| \ac{API} closely. The few additional methods documented were RubiCL specific functionality such as the bifurcation of tuple buffers. The hint document was provided so that stuck or novice users could remind themselves of basic language functionality. Care was taken as to not reveal how to solve problems directly.
+The aim of this quick demonstration was to hint at how the library may be applied to the later provided problems, in addition to an introduction or refresher to Ruby's syntax for higher-order functions. After the demonstration concluded, a link\cite{user_test_hints} containing brief \ac{API} documentation was provided. The majority of documentation was lifted directly from the Ruby documentation source, as the library mirrors the \verb|Enumerable| \ac{API} closely. The few additional methods documented were RubiCL specific functionality such as the bifurcation of tuple buffers. The hint document was provided so that stuck or novice users could remind themselves of basic language functionality. Care was taken as to not reveal how to solve problems directly.
 
 Users were provided with a skeleton file, containing a DSL for answering several given questions. Each question accepted an anonymous function response, with bound variables signifying the resources that could be used to answer the query. To respond, each applicant would replace the body of the function, originally a placeholder method, with the required query pipeline.
 

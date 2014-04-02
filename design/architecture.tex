@@ -45,7 +45,7 @@ As an overview, the steps undertaken by the RubiCL library for the example given
   \item Simplifying the $4$ tasks in the \verb|TaskQueue| to a single, \verb|MapFilter| task via \emph{fusion}.
   \item Generating the OpenCL kernel required to perform the \verb|MapFilter| task.
   \item Executing the produced kernel on the compute-device, recording metrics.
-  \item Releasing resources required by the OpenCL library during the task.
+  \item Releasing resources acquired by the OpenCL library during the task.
   \item Returning the resultant values as a Ruby array.
 \end{itemize}
 
@@ -103,7 +103,7 @@ Mirroring the responsibilities of the C-type classes, additional static methods 
 \end{description}
 
   \item[BufferManager]
-In order to prevent the \verb|Device| class becoming a \emph{god object}, manipulating the device buffer is performed through a service object. The \verb|BufferManager| provides an interface to load objects, specifying their C-type, and later retrieve them. The type of the currently loaded buffer is then stored, to assist kernel generation for queued parallel tasks.
+In order to prevent the \verb|Device| class from becoming a \emph{god object}, manipulating the device buffer is performed through a service object. The \verb|BufferManager| provides an interface to load objects, specifying their C-type, and later retrieve them. The type of the currently loaded buffer is then stored, to assist kernel generation for queued parallel tasks.
 
 The manager also provides caching of the dataset to prevent unnecessary hardware retrieval if no operations have been performed.
 
@@ -114,7 +114,7 @@ The manager's necessary ability to interact with an \ac{OpenCL} buffer is provid
 
   \item[retrieve(type: Type)] Retrieves the resultant object from the compute-device address space.
 
-  \item[access(type: Type)] Returns a handle to the device address space, passed by \verb|Device| when executing tasks.
+  \item[access(type: Type)] Returns a handle to the device address space, to be passed by \verb|Device| when executing tasks.
 \end{description}
 
 \item[Device]
@@ -181,7 +181,7 @@ Instantiated with a \verb|Task| object, the \verb|TaskKernelGenerator| assembles
 \end{description}
 
 \item[Task]
-An abstract superclass representing a stage in the computation pipeline. Subclassed with the specific type of operation. Provides tracking of variables required, computation statements and each task's unique name.
+An abstract superclass representing a stage within the computation pipeline. Subclassed with the specific type of operation. Provides tracking of variables required, computation statements and each task's unique name.
 
 \paragraph*{Interface:}
 \begin{description}
