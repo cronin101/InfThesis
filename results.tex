@@ -39,7 +39,7 @@ When parallelising purely-map tasks, the project library performs favourably com
 The figure also shows that for all tested datasets, the smallest of which contained $1$ million elements, outsourcing computation to the library was beneficial.
 
 In Figure~\ref{fig:map_task_bperf_g}, it can be seen that on both systems RubiCL throughput is not far from bespoke sequential code. On the laptop, the parallel \ac{CPU} implementation exceeds the non-parallel native extension. It achieves $1.02$ times the rate of processing on $19$ million elements.
-However, while the laptop \ac{CPU} presents $4$ hardware threads to \ac{OpenCL}, the native extension utilises only a single thread of execution. As both implementations are performing roughly the same number of operations, it appears that here \ac{OpenCL}'s raw throughput increase is insignificant after the processing-model overhead is accounted for.
+However, while the laptop \ac{CPU} presents $4$ hardware threads to \ac{OpenCL}, the native extension utilises only a single thread of execution. As both implementations are performing roughly the same number of operations, it appears that \ac{OpenCL}'s raw throughput increase is insignificant after the processing-model overhead is accounted for.
 
 It is clear that the throughput with which Ruby is capable of performing \emph{Map} tasks has been significantly increased.
 On the other hand, the project's parallel library does not significantly outperform a custom, tailored, sequential solution.
@@ -186,7 +186,7 @@ The bespoke extension performs much better comparatively at sparse filtering tha
 With this in mind, Figure~\ref{fig:sfilter_task_bperf_g} shows a decrease in performance of RubiCL relative to bespoke filtering, compared to the denser predicate examined earlier.
 
 The inverse is true in Figure~\ref{fig:sfilter_task_vperf_g}, with RubiCL demonstrating an improved $3$\textendash$5$ times speed-up when executing on \ac{GPU} devices over Ruby $2.2$ for dense filtering.
-The differences in relative performance between dense and sparse \emph{Filter} task implementations suggest that the cause for diverging ratios may result from there being fewer conditional insertions to the result vector. Alternatively, when less data is returned from a compute-device, the one-off latency penalty is more significant and may offset the benefits of relatively-high transfer bandwidth.
+The differences in relative performance between dense and sparse \emph{Filter} task implementations suggest that the cause for diverging ratios may result from there being fewer conditional insertions to the result vector. Alternatively, when less data is returned from a compute-device, less time is spent proportionally in the comparatively slow operation of cross-device data transfer compared to the quick action of filtering itself.
 
 \paragraph*{Smaller scale sparse Filter tasks}
 \begin{figure}[H]
@@ -211,7 +211,7 @@ Figure~\ref{fig:sparsefil_tasksmallrun} shows that the RubiCL library, when exec
 
 Figure~\ref{fig:dsdf_task_smallrun} shows that the lower-bound for beneficial sparse \emph{Filter} acceleration by the RubiCL library remains roughly the same for floating-point datasets as what was observed for integer datasets. Again, comparing \ac{OpenCL} execution on the \ac{CPU} to standard Ruby, it is worth outsourcing computation above $50,000$ elements.
 
-Figure~\ref{fig:dsdf_task_bigrun} demonstrates that RubiCL library offers a speed-up of around $2$ times the traditional implementation. Again, this is nearly identical to the \ac{CPU} speed-up achieved for integer datasets and suggests that the added cost of object dereferencing and re-creation, necessary for all implementations, is insignificant compared to the work involved when performing a filtering operation.
+Figure~\ref{fig:dsdf_task_bigrun} demonstrates that the RubiCL library offers a speed-up of around $2$ times the traditional implementation. Again, this is nearly identical to the \ac{CPU} speed-up achieved for integer datasets and suggests that the added cost of object dereferencing and re-creation, necessary for all implementations, is insignificant compared to the work involved when performing a filtering operation.
 
 
 
@@ -314,7 +314,7 @@ The RubiCL library offers a speed-up of around $3$\textendash$4$ times the tradi
 \end{figure}
 
 \subsubsection{Recap of operation performed}
-The datasets were sorted in ascending order, by triggering the \verb|sort| method of the dataset.
+The shuffled datasets were sorted in ascending order, by triggering the \verb|sort| method of the collection.
 RubiCL's implementation of sorting uses parallel bitonic sort. Standard Ruby $2.2$ \verb|Enumerable|s rely on \emph{quicksort}.
 
 \subsubsection{Observations and analysis}
@@ -330,12 +330,12 @@ The \emph{compare-swap} bitonic sort algorithm used by RubiCL to perform sort ta
 In addition, \emph{quicksort} is particularly celebrated for minimising the number of comparisons necessary to sort a dataset, resulting in far less work than \emph{bitonic mergesort}.
 The increase in throughput provided by scheduling across many hardware threads of a \ac{CPU} was insufficient to offset having to perform a greater number of comparisons.
 
-It is more interesting to note that Figure~\ref{fig:sortpow_van_perf_g} shows when sorting an integer dataset using the laptop's \ac{GPU}, performance around $1.5$ times that of inbuilt \emph{quicksort} can be achieved. It's important to realise that this does not mean \ac{GPU} sorting will triumph over \emph{quicksort} in other domains, though more efficient \ac{GPU} sorting algorithms have been shown to provide significant speed-up over \ac{CPU} sorting\cite{sintorn2008fast}. However, it is more likely that in this case a combination of the lack of boxed variables within the RubiCL execution environment, combined with a still-strong sorting algorithm, resulted in the RubiCL implementation performing the task faster than the RubyVM could manage.
+It is more interesting to note that Figure~\ref{fig:sortpow_van_perf_g} shows when sorting an integer dataset using the laptop's \ac{GPU}, performance around $1.5$ times that of inbuilt \emph{quicksort} can be achieved. It's important to realise that this does not mean \ac{GPU} sorting will triumph over \emph{quicksort} in other domains, though more efficient \ac{GPU} sorting algorithms have been shown to provide significant speed-up over \ac{CPU} sorting\cite{sintorn2008fast}. However, it is more likely in this case that a combination of no need for un-boxing variables within the RubiCL execution environment, combined with a still-strong sorting algorithm, resulted in the RubiCL implementation performing the task faster than the RubyVM could manage.
 
 For some reason, the performance of the desktop \ac{GPU} was not as strong as that of the laptop \ac{GPU}. This is disappointing and further work should look into why this is the case.
 \section{User evaluation}
 \paragraph*{Recap of the study performed}
-$7$ test-subjects were tasked with answering $5$ questions each. Answers to questions were obtained by querying $2$ datasets of $10,000,000$ elements each, with the assistance of the project's delivered library. This section presents the raw findings of the study, alongside interpretation and analysis.
+$7$ test-subjects were tasked with answering a test-file containing $5$ questions. Answers to questions were obtained by querying $2$ datasets of $10$ million elements each, with the assistance of the project's delivered library. This section presents the raw findings of the study, alongside interpretation and analysis.
 
 \subsection{Results}
 All applicants finished the $5$ question exercise within $20$ minutes. In most cases, the first question took the longest amount of time to complete, with an average of $4.5$ minutes. This can be explained by most people choosing to re-read the documentation and become accustomed with library usage before progressing. The next question was generally quicker to solve, with a mean of $3$ minutes, as it only involved applying a filtering stage to the previous counting pipeline. The third question took longer for most applicants, at a mean of $4$ minutes, as it introduced the new concepts of zipping and summation reduction. By the fourth question, subjects were more accustomed with the library's usage and it took a mean of $2$ minutes to complete. The final task was quick for most applicants also, taking a mean of $2.25$ minutes. In addition, most of the time was spent de-cyphering the complex requirements of the question.
@@ -360,7 +360,7 @@ In general, it was found that more-seasoned programmers completed the tasks soon
   \item Forgetting to annotate a dataset with its type declaration was common for early questions. This was particularly true for subjects with prior experience of the Ruby programming language, perhaps due to the familiarity of the task causing them to write commonplace unannotated code without further thought. Luckily, this mistake became much less common after it had been made a couple of times. All subjects were less likely to make the same mistake repeatedly as the progressed through questions.
 
   \item Most people gave anonymous function parameters useless names, like $x$, when there was only one. In contrast, meaningful names, like $id, amount$, were used when there were several bound variables present.
-    This justifies the project's decision to provide function parsing support, as it allows arbitrary naming of bound variables, used within calculations, by the programmer.
+    This justifies the project's decision to provide function parsing support, as it allows arbitrary naming of bound variables used within calculations by the programmer.
 
   \item Experienced programmers were more likely to state filtering predicates over several distinct pipeline stages, citing ease of readability as a motivating factor. This demonstrates the need to support \emph{task-fusion} within a pipeline-based execution environment. Otherwise, there would be an unnecessary penalty associated with orchestrating queries this way.
 
@@ -395,7 +395,7 @@ On the \ac{AMD} desktop system, operating \emph{Arch Linux}, installation of a c
 The \ac{OpenCL} framework uses a system, called \ac{ICD}, to allow many vendor-specific implementations of the library to be loaded on a single machine simultaneously.
 
 Unfortunately, the root, vendor agnostic, \ac{ICD} loader is out of date in the \emph{Arch Linux} repositories, with only \ac{OpenCL} $1.1$ support. Luckily, it was possible to build \verb|libopencl|, provided by \ac{AMD}, from source and install the \ac{ICD} loader correctly.
-Once the loader was installed, obtaining the actual \ac{ICD} component was straightforward. It is contained within the \ac{AMD} APP SDK, available in the \ac{AUR}.
+Once the loader was installed, obtaining the actual \ac{ICD} component was straightforward, it is contained within the \ac{AMD} APP SDK, available in the \ac{AUR}.
 However, the AMD APP SDK only provides \ac{CPU} drivers for \ac{OpenCL} execution. Furthermore, the default, \emph{free} \ac{AMD} display drivers do not allow \ac{OpenCL} access to onboard \ac{GPU} devices. The solution is to install the proprietary \verb|catalyst-utils| package, again from the \ac{AUR}. This provides required kernel modules for \ac{AMD} \ac{GPU} utilisation.
 
 The final remaining issue is that \verb|catalyst-utils| only supports a significantly out of date version of \verb|xorg-server|. This could cause issues in a system used for daily activities, as dependency clashes could leave the user having to choose between \ac{OpenCL} support and the ability to run recently-developed desktop software.

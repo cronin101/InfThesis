@@ -28,7 +28,7 @@ When a user is sure that all objects within an \verb|Enumerable| are of a single
 
 Further method calls are swallowed by the \verb|Device| instance handling the dataset, and pushed onto a work-queue.
 
-Eventually, a result is requested. This occurs either by a user casting back to a Ruby object class, or by performing a terminal action such as summation. The work-queue is then optimised and mapped to OpenCL kernels, dispatched to the target compute device.
+Eventually, a result is requested. This occurs either by a user casting back to a Ruby object class, or by performing a terminal action such as summation. The work-queue is then optimised and mapped to OpenCL kernels, dispatched to the target compute-device.
 
 The produced wrapper solution for including additional functionality to the Ruby runtime is ideal for maintaining usability. Programmers must grasp only the concept of annotating type-conversion at the beginning and end of any calculation pipeline. All other syntax of the library is identical to normally-written Ruby code.
 
@@ -36,7 +36,7 @@ Despite the simplicity of the library's presented interface, there is a lot of w
 
 As an overview, the steps undertaken by the RubiCL library for the example given in Figure~\ref{lst:example_snippet} include:
 \begin{itemize}
-  \item Moving the dataset elements into continuous memory, addressable by the compute device.
+  \item Moving the dataset elements into continuous memory, addressable by the compute-device.
   \item Recording the loaded dataset type, to allow static type-system operations.
   \item Parsing the \verb|block| argument of the \verb|#map| task's bytecode and constructing an equivalent C99 expression.
   \item Parsing the \verb|block| argument of the \verb|#select| task's bytecode and constructing an equivalent C99 expression.
@@ -44,7 +44,7 @@ As an overview, the steps undertaken by the RubiCL library for the example given
   \item Inserting a \verb|Map| task at the end of the \verb|TaskQueue| to convert from C \verb|int|s back to Ruby objects.
   \item Simplifying the $4$ tasks in the \verb|TaskQueue| to a single, \verb|MapFilter| task via \emph{fusion}.
   \item Generating the OpenCL kernel required to perform the \verb|MapFilter| task.
-  \item Executing the produced kernel on the compute device, recording metrics.
+  \item Executing the produced kernel on the compute-device, recording metrics.
   \item Releasing resources required by the OpenCL library during the task.
   \item Returning the resultant values as a Ruby array.
 \end{itemize}
@@ -58,16 +58,16 @@ Other responsibilities include storing versioning metadata and selecting which a
 
 \paragraph*{Interface:}
 \begin{description}
-  \item[self.opencl\_device] Returns the current compute device. (The default for this value is \verb|RubiCL::CPU|)
-  \item[self.opencl\_device=(Device)] Sets the current compute device.
+  \item[self.opencl\_device] Returns the current compute-device. (The default for this value is \verb|RubiCL::CPU|)
+  \item[self.opencl\_device=(Device)] Sets the current compute-device.
 \end{description}
 
   \item[CastAccess] A module designed to extend container types, providing the ability to initiate a computation pipeline.
-    For example, the Behaviour of the \verb|Array| built-in class is extended by mixing-in the module in the following manner:
+    For example, the Behaviour of the \verb|Array| built-in class is extended by mixing-in this module in the following manner:
 \begin{lstlisting}[language=Ruby]
 Array.class_eval { include RubiCL::CastAccess }
 \end{lstlisting}
-This allows parallel primitives performed on \verb|Arrays| to be executed by the compute device following an annotation, such as \verb|[1, 2, 3][Int]|.
+This allows parallel primitives performed on \verb|Arrays| to be executed by the compute-device following an annotation, such as \verb|[1, 2, 3][Int]|.
 Upon casting, the actual conversion operations performed are specified by the target class. This module is decoupled from implementation and provides purely syntactic enhancements.
 
 Traditionally in Ruby, invoking the \verb|[]| method of an \verb|Enumerable| is only used for indexed access to collection members. The standard implementation supports receiving integer arguments and returns the element at the given offset. It also supports \verb|Range| arguments and returns the corresponding continuous subset.
@@ -76,7 +76,7 @@ The assumption was made that that providing a \verb|Class| constant as an argume
 
 \paragraph*{Interface:}
 \begin{description}
-  \item[$\lbrack\rbrack$(Type)] Overridden on extended object to call the conversion method, provided by a \verb|Class| argument's \verb|rubicl_conversion|, on the current compute device, referencing the dataset it was called on. Behaviour when called with a non-\verb|Class| argument is unchanged.
+  \item[$\lbrack\rbrack$(Type)] Overridden on extended object to call the conversion method, provided by a \verb|Class| argument's \verb|rubicl_conversion|, on the current compute-device, referencing the dataset it was called on. Behaviour when called with a non-\verb|Class| argument is unchanged.
 \end{description}
 
   \item[Target C-type classes]
@@ -84,11 +84,11 @@ An observant reader may notice that the constant \verb|Int| is passed in Figure~
 
 The \verb|Int| class was constructed to represent the abstract type of C integers. In addition, the \verb|Double| type has been defined for double precision floating-point numbers.
 
-Each C-type class defines how to transfer a similarly typed input dataset to the compute device, via methods defined by the \verb|BufferManager|.
+Each C-type class defines how to transfer a similarly typed input dataset to the compute-device, via methods defined by the \verb|BufferManager|.
 
 \paragraph*{Interface:}
 \begin{description}
-  \item[self.rubicl\_conversion] Provides the method and type arguments to call on the current compute device, alongside a dataset, in order to load it.
+  \item[self.rubicl\_conversion] Provides the method and type arguments to call on the current compute-device, alongside a dataset, in order to load it.
 \end{description}
 
 \item[Native Ruby result classes]
@@ -99,7 +99,7 @@ The Ruby classes used to convert back to the calculation's result type are provi
 Mirroring the responsibilities of the C-type classes, additional static methods have been added to these classes to instruct the \verb|BufferManager| how to return a result dataset for the given type.
 \paragraph*{Interface:}
 \begin{description}
-  \item[self.rubicl\_conversion] Provides the method to call on the current compute device, in order to retrieve the typed dataset.
+  \item[self.rubicl\_conversion] Provides the method to call on the current compute-device, in order to retrieve the typed dataset.
 \end{description}
 
   \item[BufferManager]
@@ -110,9 +110,9 @@ The manager also provides caching of the dataset to prevent unnecessary hardware
 The manager's necessary ability to interact with an \ac{OpenCL} buffer is provided by the \verb|BufferBackend| native extension module.
 \paragraph*{Interface:}
 \begin{description}
-  \item[load(type: Type, object: Object)] Makes the provided object addressable by the \ac{OpenCL} compute device.
+  \item[load(type: Type, object: Object)] Makes the provided object addressable by the \ac{OpenCL} compute-device.
 
-  \item[retrieve(type: Type)] Retrieves the resultant object from the compute device address space.
+  \item[retrieve(type: Type)] Retrieves the resultant object from the compute-device address space.
 
   \item[access(type: Type)] Returns a handle to the device address space, passed by \verb|Device| when executing tasks.
 \end{description}
@@ -144,12 +144,12 @@ Where possible, all methods return the device context to allow method chaining.
 
   \item[filter(\&Block)] Rejects elements from the buffer that do not pass the provided predicate function. Aliased also as \verb|select| to be consistent with the Ruby standard library.
 
-  \item[scan(Style, Pperator)] Produces an array of intermediate results, equivalent to traversing the array and applying the reduction operator up until each point. Inclusive or exclusive option set via parameter, inclusive by default.
+  \item[scan(Style, Operator)] Produces an array of intermediate results, equivalent to traversing the array and applying the reduction operator up until each point. Inclusive or exclusive option set via parameter, inclusive by default.
 
 
   \item[sum] Returns the summation of all values in the buffer.
 
-  \item[count(Value?, \&Block? )] If provided with a value, returns the number of times that the given value appears in the buffer. If provided with an anonymous function, returns the number of values in the buffer that satisfy the predicate. If no arguments are provided, returns the length of the buffer.
+  \item[count(Value?, \&Block?)] If provided with a value, returns the number of times that the given value appears in the buffer. If provided with an anonymous function, returns the number of values in the buffer that satisfy the predicate. If no arguments are provided, returns the length of the buffer.
 \end{description}
 
 \item[LambdaBytecodeParser]
@@ -229,7 +229,7 @@ Stores the entire computation pipeline of the current execution chain. Enqueued 
 }
 
 \subsection{Interacting with hardware devices}
-Interaction with hardware devices present on the system occurs via native extensions. These extension modules are mixed-into device singletons, created when the library is first launched. Figure~\ref{fig:rubicl_devices} shows the functionality of these singletons and their subcomponents.
+Interaction with hardware devices, present on the system, occurs via native extensions. These extension modules are mixed-into device singletons, created when the library is first launched. Figure~\ref{fig:rubicl_devices} shows the functionality of these singletons and their subcomponents.
 
 \begin{figure}[h]
   \includegraphics[width=0.8\textwidth]{./figures/arch_diagram.pdf}
@@ -237,7 +237,7 @@ Interaction with hardware devices present on the system occurs via native extens
   \label{fig:rubicl_devices}
 \end{figure}
 
-Both \verb|CPU| and \verb|GPU| objects, tasked with managing device state, inherit from a common \verb|Device| superclass. The main difference in their implementation is differing initialisation procedure. Having two device types allows target-specific optimisation by the code generator, shown later.
+Both \verb|CPU| and \verb|GPU| objects, tasked with managing device state, inherit from a common \verb|Device| superclass. The main difference in their implementation is differing initialisation procedure. Having two device types allows target-specific optimisation by the code generator.
 
 The \verb|Device| subclasses delegate maintaining the list of tasks to a \verb|TaskQueue| object. In addition, they lack the ability to call memory management functions on devices.
 Instead of handling device memory directly, \verb|Device| objects request functionality through an instance of \verb|DeviceService::BufferManager|.

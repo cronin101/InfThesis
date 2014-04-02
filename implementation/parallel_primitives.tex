@@ -1,6 +1,6 @@
 \section{Parallel primitives}
 \subsection{Map}
-\verb|Map| is a higher-order function that mutates all elements in a provided input vector by applying a function parameter. It can be used to concisely describe a uniform alteration.
+\verb|Map| is a higher-order function that mutates all elements in a provided input vector, by applying a function parameter. It can be used to concisely describe a uniform alteration.
 \verb|Map| is simple to parallelise since no sharing of each individual thread's state is required.
 \paragraph*{Algorithm design}
 \begin{algorithm}
@@ -37,7 +37,7 @@ The dependency graph for a \verb|map| of $\|A\| = 6$ is shown in Figure~\ref{fig
   \end{center}
 \end{figure}
 
-When analysing data-dependency graphs, such as the one above, any partitioning that doesn't sever edges denotes a valid parallel strategy. Since Figure~\ref{fig:mapgraph} contains no inter-node dependencies, it is trivial to schedule the task concurrently on many compute units. The \verb|map| task is \emph{embarrassingly parallel}.
+When analysing data-dependency graphs, such as the one above, any partitioning that doesn't sever edges denotes a valid parallel strategy. Since Figure~\ref{fig:mapgraph} contains no inter-node dependencies, it is trivial to schedule the task concurrently on many compute-units. The \verb|map| task is \emph{embarrassingly parallel}.
 
 \algblockdefx[Pf]{PFor}{EndPFor}{\textbf{in parallel, for} }{\textbf{end parallel for}}
 \begin{algorithm}
@@ -107,6 +107,7 @@ After benchmarking the execution time of the kernels presented in Algorithms \re
 Influenced by these findings, the decision was made to use Algorithm~\ref{alg:oclmap} for \verb|map| tasks. This is due to the design being conceptually simpler, and therefore choosing the most basic solution that works well.
 
 \subsection{Scan}
+It is easier to explain the operation of the \verb|scan| primitive after explanation of \verb|Reduce| has been given.
 \verb|Reduce| is a higher-order function that takes an array and an initial `result' value (usually an identity value) and then repeatedly applies a combining function to produce an output.
 
 The final result is equivalent to repeatedly updating the initial value with the output of itself and the next set member using the combiner. Using this technique, the input array is consumed once while the result is cumulatively generated. Any associative reduction function can be parallelised to increase throughput.
@@ -115,7 +116,7 @@ A well-known example of reduction is when the initial value is $0$ and the combi
 
 \verb|Scan| is similar to \verb|Reduce| in that it takes an input vector and a combining function.
 
-Instead of returning the final result, Scan returns a vector that is equal to the intermediate values if the combining function was incrementally applied from one end of the dataset to the other. \verb|Scan| can also exploit a highly-parallel architecture when supplied with suitable operators.
+Instead of returning the final result, Scan returns a vector that is equal to the intermediate values produced, if the combining function was incrementally applied from one end of the dataset to the other. \verb|Scan| can also exploit a highly-parallel architecture when supplied with suitable operators.
 
 \paragraph*{Algorithm design}
 \begin{algorithm}
@@ -200,17 +201,12 @@ A parallel algorithm's \emph{cost} is defined as its asymptotic runtime multipli
 
 
 The \emph{odd-even} prefix sum algorithm can process a dataset of size $n$ in $O(\log n) + \frac{O(n)}{\|CU\|}$ stages of execution. This gives a cost of $O(\|CU\| \log n) + O(n)$.
-Importantly, it is \emph{cost-optimal}, meaning that its cost is equal to that of the best-known sequential algorithm, when $\|CU\| = O(\frac{n}{\log n})$. This is an entirely reasonable assumption given large datasets and the number of compute-units ($4-48$) present on commodity \ac{OpenCL} devices.
+Importantly, it is \emph{cost-optimal}, meaning that its cost is equal to that of the best-known sequential algorithm, when $\|CU\| = O(\frac{n}{\log n})$. This is an entirely reasonable assumption given large datasets and the comparatively low number of compute-units ($4-48$) present on commodity \ac{OpenCL} devices.
 
 This discovery suggests that it is possible to increase the throughput of \verb|scan| tasks significantly, by scheduling them across massively parallel \ac{OpenCL} devices.
 
-\paragraph*{\ac{OpenCL} kernel design}
-In fact, the kernel and calling algorithm utilised differs from \emph{odd-even} scan in that it is designed to perform better on typical \ac{OpenCL} compute devices.
-
-It was adapted from an example provided within the Apple \ac{OpenCL} SDK, modified to allow arbitrary element types and operate on buffers within the RubiCL environment.
-
 \subsection{Scatter}
-The \verb|Scatter| primitives receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
+The \verb|Scatter| primitive receives an input array $A$, an array of indices $I$, and an output array $B$. It updates $B$ such that $B_{I_i} \Leftarrow A_i$. Put otherwise, it inserts the value given at offset $i$ of $A$ into $B$, at the position given by the value at offset $i$ of $I$.
 
 \verb|Scatter| is useful for reordering a collection or projecting a subset of an input dataset into an output dataset.
 
@@ -359,7 +355,7 @@ Checking the predicate is simple to do in parallel, since whether to keep each e
   \end{center}
 \end{figure}
 
-The \verb|filter| operation is clearly not \emph{embarrassingly parallel}. However, there is no need to search for an involved parallel algorithm. We can construct an efficient \verb|filter| operation by reusing the previously defined parallel primitives, \verb|map|, \verb|scan|, and \verb|scatter|. This insight transforms a hard problem into one much easier to solve.
+The \verb|filter| operation is clearly not \emph{embarrassingly parallel}. However, there is no need to search for an involved parallel algorithm. We can construct an efficient \verb|filter| operation by reusing the previously defined parallel primitives, \verb|map|, \verb|scan|, and \verb|scatter|. This insight transforms a hard problem into one that is much easier to solve.
 
 \paragraph*{Composing a parallel solution}
 The first stage of producing a parallel \verb|filter| primitive is recognising the distinct data dependencies:
@@ -439,4 +435,4 @@ The project's sorting capability is provided by parallel \emph{bitonic mergesort
 
 A simple implementation of bitonic mergesort, whereby single elements are compared and possibly swapped at each gate, can sort an input sequence of length $n$ with $O(n \log^2 n)$ cost. This is not cost-optimal as sequential sorting algorithms can perform the task in $O(n \log n)$ comparisons. However, sorting network based algorithms are suitable for \ac{SIMD} execution as the same sequence of comparisons will always occur, independent of the input elements' values.
 
-The bitonic mergesort kernel, generated and dispatched for all RubiCL's \verb|sort| tasks, was adapted from sample code for sorting provided within the \ac{AMD} APP SKD.
+The bitonic mergesort kernel, generated and dispatched for all RubiCL's \verb|sort| tasks, was adapted from sample code for sorting provided within the \ac{AMD} APP SDK.

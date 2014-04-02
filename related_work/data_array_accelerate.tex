@@ -1,14 +1,14 @@
 \subsection{Data.Array.Accelerate}
 
-Data.Array.Accelerate is a Haskell project\cite{daa}, and accompanying library\cite{daalib}, providing massive parallelism to idiomatic Haskell code. It aims to approach the performance of `raw' \ac{CUDA} implementations, utilising custom kernels.
+Data.Array.Accelerate is a Haskell project\cite{daa}, and accompanying library\cite{daalib}, providing massive parallelism to idiomatic Haskell code. It aims to approach the performance of `raw' \ac{CUDA} implementations, utilising handwritten kernels.
 
-The library introduces new types for compute containers. Built-in types are wrapped prior to inclusion in any computation. This allows the runtime to gather information about which datasets need to be transferred to compute devices, and how to structure them in device memory.
+The library introduces new types for compute containers. Built-in types are wrapped prior to inclusion in any computation. This allows the runtime to gather information about which datasets need to be transferred to compute-devices, and how to structure them in device memory.
 
 It has received some significant optimisations\cite{daaopt} that target the inefficiencies present when an unnecessarily large number of kernels would be generated and executed, due to composition of functions.
 
 \paragraph*{Divergences}
-A disadvantage of Data.Array.Accelerate for general-purpose computation is the relative difficulty often associated with becoming a competent Haskell programmer. The language diverges greatly from many mainstream languages.  It requires programmers to state calculations in purely functional form.
+A disadvantage of relying on Data.Array.Accelerate for general-purpose computation is the relative difficulty often associated with becoming a competent Haskell programmer. The language diverges greatly from many mainstream languages.  It requires programmers to state calculations in purely functional form.
 
-The Accelerate library offers easy transition into \ac{GPU} programming for existing Haskell programmers. However, people with little Haskell experience may struggle to construct valid code.
+The Accelerate library offers an easy transition into \ac{GPU} programming for existing Haskell programmers. However, people with little Haskell experience may struggle to construct valid code.
 
  To counter this, a more forgiving non-purely-functional language will be chosen for this project. Using a language that is easy for beginners to pick up will allow more people to attempt parallelising execution of their calculations.

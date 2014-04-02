@@ -1,7 +1,7 @@
 \section{Management System}
 
 \subsection{Converting between Ruby and C objects}
-One important issue to overcome when designing an library to accelerate Ruby processing, is the fact that the RubyVM stores all values within \emph{objects}, in a manner that is very different from C.
+One important issue to overcome when designing an library to accelerate Ruby processing, is the fact that the RubyVM stores all raw values within \emph{objects}, in a manner that is very different from C.
 
 Internally, the RubyVM's C implementation references all objects as of type \verb|VALUE|. This value-type is a slight misnomer as it (usually) contains a pointer to an object structure.
 
@@ -11,17 +11,17 @@ There are several object structures used to represent raw data within the RubyVM
      \item A specialised object representation, used to increase performance of heavily utilised object types. Examples include \verb|RString|, \verb|RFloat|, and \verb|RArray|.
 \end{itemize}
 
-The first member of both structures is another structure called \verb|RBasic|. This contains meta-data about the object, such as what type it is. Therefore, it is possible to obtain the typing information of object designated by a \verb|VALUE|, by examining the meta-data present in it's first structure member.
+The first member of both structures is another structure called \verb|RBasic|. This contains meta-data about the object, such as what type it is. Therefore, it is possible to obtain the typing information of any object designated by a \verb|VALUE|, by examining the meta-data present in its first structure member.
 
-Since integers are often heavily utilised within computer programs, and often short-lived, the RubyVM implementation avoids the creation of integer objects in order to improve performance.
+Since integers are often heavily utilised within computer programs, and often short-lived, the standard RubyVM implementation avoids the creation of integer objects in order to improve performance.
 Instead, it encodes the value of the first $2^{64 - 2}$ integers directly into the \verb|VALUE| `pointer', setting the final 2 bits as the flag \verb|0x01|.
-It can be deduced that a pointer with an odd value is not pointing to a valid memory location, as is true for any pointer that does not align to word-length boundaries. In this case, a flag lookup table can be used in order to determine the correct typing information.
+It can be deduced that a pointer with an odd value is not pointing to a valid memory location, as is true for any pointer that does not align to the machine's word-length boundaries. In this case, a flag lookup table can be used in order to determine the correct typing information.
 
-When dealing with tagged-pointers, the corresponding value of pointer \verb|p| can be retrieved with \verb|p >> 1|. To create a tagged-pointer, the value \verb|x| can be encoded with \verb?(x << 1) | 0x01 ?. The RubiCL project utilises this fact by transferring an array of \verb|VALUE| pointers directly to the compute-device, whenever annotation has suggested that all contained elements are of \verb|Fixnum| type. There, the bit-shifting conversions, present at either end of the computation pipeline, can be performed in parallel to increase throughput.
+When dealing with tagged-pointers, the corresponding value of pointer \verb|p| can be retrieved with \verb|p >> 1|. To create a tagged-pointer, the value \verb|x| can be encoded with \verb?(x << 1) | 0x01 ?. The RubiCL project exploits this fact by transferring an array of \verb|VALUE| pointers directly to the compute-device, whenever annotation has suggested that all contained elements are of \verb|Fixnum| type. There, the bit-shifting conversions, present at either end of the computation pipeline, can be performed in parallel to increase throughput.
 
-\subsection{Transferring data to and from device}
+\subsection{Transferring data to and from the compute-device}
 As \ac{OpenCL} is designed to provide an abstraction over specific hardware details, the memory management functionality it provides reflects this agnosticism.
-A common method for providing input data to a compute-device is to explicitly create a buffer of the required size, within the device's \emph{context}, and then enqueue a \verb|clWriteBuffer| task to fill it with any elements to process. This buffer object is then provided as a kernel parameter, prior to kernel invocation. To retrieve the processed elements, a \verb|clReadBuffer| task is enqueued.
+A common method for providing input data to a compute-device is to explicitly create a buffer of the required size, within the device's \emph{context}, and then enqueue a \verb|WriteBuffer| task to fill it with any elements to process. This buffer object is then provided as a kernel parameter, prior to kernel invocation. To retrieve the processed elements, a \verb|ReadBuffer| task is enqueued.
 
 This workflow causes several issues. Firstly, when the compute-device selected is the system \ac{CPU}, unnecessary data copying occurs. The original location of the dataset is already addressable by the \ac{CPU} device so there is no need to move elements into a new buffer, this just causes unnecessary delay. The same is true when retrieving processed elements, there is no reason that the host program cannot access the element buffer directly. Secondly, when writing data into the device buffer, data-flow occurs through the host device. This is inefficient on many systems when interfacing with a \ac{GPU} device, since \emph{kernel-mode} execution is required to transfer data over the \ac{PCI} bus and \ac{OS}-enforced context switching increases latency.
 
@@ -179,7 +179,7 @@ The conversion algorithm makes the assumption that all non-literals are function
 \paragraph*{Handling conditionals}
 Conditional operators, such as \verb|&&|, complicate the reconstruction process. Instead of modifying the value of a stack-machine, they may perform a branch. Whether or not this occurs depends on the \verb|truthyness| of the current value. This is caused by the optimisation of short-circuiting boolean calculations.
 
-Luckily, at the point that the branch is possibly triggered, no mathematical operators will mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply abandoning the current expression, ending in a conditional, and starting a new stack. All expressions produced are then just combined in order after the token stream has been exhausted.
+Luckily, at the point that the branch is possibly triggered, no further operators can mutate the previous value directly. This means that the difficultly of handling branching can be sidestepped by simply abandoning the current expression, ending in a conditional, and starting a new stack. All expressions produced are then just combined in order after the token stream has been exhausted.
 
 \subsection{Task queue}
 The \verb|TaskQueue| management system buffers all deferred tasks, scheduled during the computation pipeline. It is responsible for detecting potential optimisations and applying them prior to dispatch.
@@ -241,4 +241,4 @@ In the order presented, the types of fusion supported are as follows:
 end
 \end{lstlisting}
 
-Options to turn-off \verb|TaskQueue| optimisation were introduced so that the magnitude of benefits can be studied. This will be revisited in the \emph{Evaluation} chapter.
+Options to turn-off \verb|TaskQueue| optimisation were introduced so that the magnitude of benefits can be studied.

@@ -47,7 +47,7 @@ end
 Keeping the usage akin to a conceptually similar feature should make the library easier for inexperienced programmers to get to grips with.
 
 \subsection{Eager or deferred task dispatching}
-During system design, the decision had to be made whether to eagerly evaluate parallel primitives or to buffer all requests and then dispatch when a result is requested. This choice is not straightforward as there are benefits to either option.
+During system design, the decision had to be made whether to eagerly evaluate parallel primitives or to buffer all requests and then dispatch tasks when a result is requested. This choice is not straightforward as there are benefits to either option.
 
 \paragraph*{Advantages of eager dispatch}
 \begin{itemize}
@@ -67,22 +67,22 @@ During system design, the decision had to be made whether to eagerly evaluate pa
 \item Fewer work-units scheduled. It is a waste of iterations to have $3$ \verb|for-loop|s each modify a collection when all operations could occur in a single loop. It is similarly wasteful to execute $N$ work-units $3$ times when only $N$ are needed.
 \end{itemize}
 
-The chosen execution style was to defer task requests and then execute optimised tasks when a result is required.
+The execution style chosen was to defer task requests and then execute optimised tasks when a result is required.
 
 This mirrors the approach taken by many \emph{Object-Relational Mappers}, such as \verb|ActiveRecord|, combining a pipeline of queries into optimal SQL.
 
-The assumption was made that requiring multiple passes over the input dataset was significantly more expensive than the one-off code generation tasks. This was verified by timing information collected during empirical testing:
+The assumption was made that requiring multiple passes over the input dataset was significantly more expensive than the one-off code generation tasks. This was verified by timing information collected during empirical testing.
 
 \subsection{Construction and processing of tuple datasets}
-In order to allow a greater variety of query styles to be accelerated, it became clear that tuples should be introduced as a data-type. This necessitated the functionality to load a dataset of tuple elements onto the compute device and support of parallel queries possible on a standard dataset.
+In order to allow a greater variety of query styles to be accelerated, it became clear that tuples should be introduced as a data-type. This necessitated the development of functionality to load a dataset of tuple elements onto the compute-device. It also required supporting the execution of parallel queries, possible on standard datasets, on the new dataset type.
 
-After careful consideration of the requirements, two methods of achieving tuple support appeared suitable for the project.
+After careful consideration of the requirements, two methods of achieving tuple functionality appeared suitable for the project.
 
 \paragraph*{Custom structures of data for each element} \ac{OpenCL} supports the usage of \verb|struct|s in kernel code. With this in mind, it would be possible to store each tuple continuously in memory and use member access to retrieve each slot. The size of each tuple structure can be used to guide memory management on the host. There are both advantages and disadvantages to this method of implementation. 
 
-An advantage of using structures is the ease of supporting arbitrary length tuples. The host code only knows about the size of each tuple, so that this information can be combined with the number of elements present when allocating the correct amount of device memory. The pre-compiled back-end code has no notion of tuple structure. Only the generated kernel code has the need to interact with slots within a tuple. As such, the structure definition can be generated dynamically at the same point as task definition. 
+An advantage of using structures is the ease of supporting arbitrary length tuples. The host code only knows about the size of each tuple. This information is combined with the number of elements present when allocating the correct amount of device memory. The pre-compiled back-end code has no notion of tuple structure. Only the generated kernel code has the need to interact with slots within a tuple. As such, the structure definition can be generated dynamically at the same point as task definition. 
 
-One disadvantage of using structures is the need to recreate the entire dataset whenever tuples alter length. For example, if an array of 2-element tuples is loaded to the device, and a third slot is added to each, it is necessary to initialize a new buffer and fill it by copying existing values then inserting a new slot value for each tuple. This is the same issue faced when inserting an element within a fixed-size vector. This issue would result in increase cost of the \verb|zip| operator when creating or resizing tuples.
+One disadvantage of using structures is the need to recreate the entire dataset whenever tuples alter in length. For example, if an array of 2-element tuples is loaded to the device, and a third slot is added to each, it is necessary to initialize a new buffer and fill it by copying existing values then inserting a new slot value for each tuple. This is the same issue faced when inserting an element within a fixed-size vector. This issue would result in an increased cost of the \verb|zip| operator when creating or resizing tuples.
 
 \paragraph*{Virtual tuples stored in disjoint datasets}
 When processing tuples of length $2$, instead of creating a buffer storing tuples continuously in memory, two dataset buffers can be provided to each invoked kernel. The first buffer stores the first slot value for each tuple. Likewise, the second buffer stores all second slot values. The generated kernel code can then be designed to operate on tuples as intended, by accessing the indexed value from the buffer corresponding to the slot requested.

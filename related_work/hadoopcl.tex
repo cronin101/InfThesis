@@ -1,12 +1,12 @@
 \subsection{HadoopCL}
 HadoopCL\cite{hadoopcl} is an extension to the Hadoop\cite{hadoop} distributed-filesystem and computation framework. Again, it provides scheduling and execution of generic tasks on  \ac{GPU} hardware. Since it uses \ac{OpenCL}, as opposed to \ac{CUDA}, it also supports execution on \ac{CPU} devices.
 
-One benefit, for usability, of HadoopCL over MARS is the usage of the \verb|aparapi| library\cite{aparapi} to generate required task kernels. Often,  composing and scheduling custom \ac{OpenCL} kernels requires significant amount of boilerplate. The purely-Java \ac{API} allows programmers to skip a large portion of this boilerplate and focus instead on the task at hand.
+One benefit, for usability, of HadoopCL over MARS is the usage of the \verb|aparapi| library\cite{aparapi} to generate the required task kernels. Often, composing and scheduling custom \ac{OpenCL} kernels requires significant amount of boilerplate code. The purely-Java \ac{API} allows programmers to skip a large portion of this boilerplate and focus instead on the task at hand.
 
-The fact that the interface resembles threaded Java programming is another plus. However, it still requires writing functions with logic guided by the notion of kernel execution \verb|id|s. This does not mitigate the need to become familiar with a new paradigm for data-parallel computation. Therefore, the system is still not suitable for novice users.
+The fact that the interface resembles threaded Java programming is another plus. However, it still requires that functions are written containing logic guided by the notion of kernel execution \verb|id|s. This does not mitigate the need to become familiar with a new paradigm for data-parallel computation. Therefore, the system is still not suitable for novice users.
 
 \paragraph*{Divergences}
-Instead of presenting an interface for programmers to write \ac{OpenCL} code via shortcuts, the RubiCL project will boast the ability to automatically transform and parallelise simple computational primitives written in native code. This may suffer from reduced flexibility, but benefits from a significantly lower barrier-to-entry for inexperienced users.
+Instead of presenting an interface for programmers to write \ac{OpenCL} code via shortcuts, the RubiCL project will boast the ability to automatically transform and parallelise simple computational primitives written in Ruby code. This may suffer from reduced flexibility, but benefits from a significantly lower barrier-to-entry for inexperienced users.
 
 Yet, constraining the user to the MapReduce computation pattern also reduces flexibility. The lack of arbitrary kernels for common tasks is not a significant drawback as long as any parallel task primitives are varied and composable.
 
