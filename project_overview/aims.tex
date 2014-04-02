@@ -44,7 +44,7 @@ The completed library should be presented to novice analysts, users with mathema
 \subsection{Exploring the extensibility of the Ruby programming language}
 Ruby has served as a suitable foundation for many \acp{DSL}, including build tools\cite{rake} and web frameworks\cite{sinatra}.
 
-The language has open classes, whereby the structure of object classes can always be altered at runtime, even after definition ends. It also permits a variety of meta-programming techniques, allowing complicated code to appear misleadingly simple at the surface.
+The language has open classes, whereby the structure of object classes can always be altered at run-time, even after definition ends. It also permits a variety of meta-programming techniques, allowing complicated code to appear misleadingly simple at the surface.
 
 \begin{lstlisting}[
   language=Ruby,
@@ -60,9 +60,9 @@ end
 
 Objects in Ruby are often regarded as \emph{duck-typed}. This means that the system should care only about how an object behaves \textemdash{} ``If it looks like a duck, swims like a duck, and quacks like a duck, then it probably is a duck.''\cite{ducktest}
 
-Since function invocation uses a \emph{method-sending} approach, the underlying implementation can be altered significantly as long as an expected dialog is presented to the runtime.
+Since function invocation uses a \emph{method-sending} approach, the underlying implementation can be altered significantly as long as an expected dialog is presented to the run-time.
 
-This project demonstrates integrating drastically different processing techniques into the language's runtime. It achieves this without greatly affecting the code that a user must write in order to use them.
+This project demonstrates integrating drastically different processing techniques into the language's run-time. It achieves this without greatly affecting the code that a user must write in order to use them.
 
 \paragraph*{Indicators of success}
 The integration will be successful if the interface for processing data remains consistent. Parallelism should be implicit and not requiring direction from the programmer. Again, user testing will evaluate this.

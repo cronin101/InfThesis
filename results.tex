@@ -104,7 +104,7 @@ The dense \emph{Filter} task performed was the equivalent of \verb!#select { |x|
 
 \paragraph*{Observations and analysis}
 Figure~\ref{fig:dfilter_task_runtime_g} is less cluttered than the corresponding graph for \emph{Map} tasks, as there is more variation between the performance of dense \emph{Filter} implementations.
-The figure suggests that \emph{Filter} tasks scheduled on the desktop system suffer from a higher latency than their counterparts on the laptop. This is signified by the comparatively elevated runtime for smaller datasets.
+The figure suggests that \emph{Filter} tasks scheduled on the desktop system suffer from a higher latency than their counterparts on the laptop. This is signified by the comparatively elevated run-times for smaller datasets.
 
 Further unlike \emph{Map} tasks, on both systems the \ac{GPU} compute-devices outperform the \ac{CPU} when filtering large datasets. For the laptop system, the domination is present on every tested dataset size. On the contrary, the desktop \ac{CPU} is initially a shade faster but is quickly dwarfed by the significantly higher throughput of the \ac{GPU} device.
 
@@ -249,7 +249,7 @@ Again this returns a dataset that is half of the original size. Furthermore, the
 
 \paragraph*{Observations and analysis}
 When a \emph{Map} task is followed by a \emph{Filter} task, the project's task fusion optimisation drastically improves performance.
-Figure~\ref{fig:mfilter_task_runtime_g} demonstrates how significantly runtime diverges, with the gap between Ruby $2.2$ and competing implementations expanding greatly as larger datasets are introduced.
+Figure~\ref{fig:mfilter_task_runtime_g} demonstrates how significantly run-time diverges, with the gap between Ruby $2.2$ and competing implementations expanding greatly as larger datasets are introduced.
 The need for multiple passes over the data greatly delays the unoptimised code, as intermediate yet discarded results for the method pipeline are computed.
 The optimisation can be seen to reduce the minimum dataset length required for RubiCL's desktop parallelism to provide performance gains over the standard implementation, shown in Figure~\ref{fig:mfilter_task_vperf_g}. At just $2$ million elements, it is less than half of that required when filtering alone.
 
@@ -385,7 +385,7 @@ Due to the questions being designed to only have one possible answering techniqu
 Each question restarted the computation pipeline instead of carrying on, in order to keep answers distinct and easier to reason about.
 
 The mean time of execution, on the testing laptop's \ac{GPU}, for the produced solutions was $12.2$ seconds.
-This compares favorably with the $49.5$ seconds required by an identical pure-Ruby implementation, giving a speed-up factor of $4.06$.
+This compares favourably with the $49.5$ seconds required by an identical pure-Ruby implementation, giving a speed-up factor of $4.06$.
 
 \section{Portability}
 As mentioned during the \emph{Introduction} chapter, \ac{OpenCL} is still harder to utilise on some systems than the corresponding hardware vendors would have you believe.

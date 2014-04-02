@@ -30,7 +30,7 @@ Further method calls are swallowed by the \verb|Device| instance handling the da
 
 Eventually, a result is requested. This occurs either by a user casting back to a Ruby object class, or by performing a terminal action such as summation. The work-queue is then optimised and mapped to OpenCL kernels, dispatched to the target compute-device.
 
-The produced wrapper solution for including additional functionality to the Ruby runtime is ideal for maintaining usability. Programmers must grasp only the concept of annotating type-conversion at the beginning and end of any calculation pipeline. All other syntax of the library is identical to normally-written Ruby code.
+The produced wrapper solution for including additional functionality to the Ruby run-time is ideal for maintaining usability. Programmers must grasp only the concept of annotating type-conversion at the beginning and end of any calculation pipeline. All other syntax of the library is identical to normally-written Ruby code.
 
 Despite the simplicity of the library's presented interface, there is a lot of work going on behind the scenes. The technical details of which will be discussed over the following $2$ chapters.
 
@@ -53,7 +53,7 @@ As an overview, the steps undertaken by the RubiCL library for the example given
 The library is constructed from the following set of modules and classes, alongside their responsibilities:
 \begin{description}
   \item[RubiCL] Environment singleton and top level namespace.
-The library's functionality is included in an application by \verb|require|ing this module. It handles the import of all sub-components of the runtime.
+The library's functionality is included in an application by \verb|require|ing this module. It handles the import of all sub-components of the run-time.
 Other responsibilities include storing versioning metadata and selecting which available device should be the default compute target.
 
 \paragraph*{Interface:}
@@ -233,7 +233,7 @@ Interaction with hardware devices, present on the system, occurs via native exte
 
 \begin{figure}[h]
   \includegraphics[width=0.8\textwidth]{./figures/arch_diagram.pdf}
-  \caption{The RubiCL runtime maintains singletons for each device, used to trigger management functions and execute kernels.}
+  \caption{The RubiCL run-time maintains singletons for each device, used to trigger management functions and execute kernels.}
   \label{fig:rubicl_devices}
 \end{figure}
 

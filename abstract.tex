@@ -1,4 +1,4 @@
-This project presents a library that eases the parallelisation of several higher-order functions, originally provided within the Ruby standard-library.
+This project presents a library that automates the parallelisation of several higher-order functions, originally provided within the Ruby standard-library.
 The library distributes computation across many compute-units, following an annotation specifying that primitives are solely operating on numerical data. RubiCL harnesses the OpenCL framework in order to allow execution to occur on CPU or GPU devices.
 
 The library provides a simple interface to parallel processing, without the need for the user to specify orchestration specifics. This reduces barriers-to-entry concerning the exploitation of massively-parallel hardware. Utilising the development system's APU, the project achieved an execution speed-up of up to $9$ times the standard Ruby implementation of higher-order computation pipelines. System performance was benchmarked and presented over a variety of task formulations, target systems, and input-data quantities.

@@ -1,11 +1,11 @@
 \subsection{MARS}
-The MARS\cite{mars} project provides a MapReduce\cite{mapreduce} runtime, executing on \ac{GPU} systems.
+The MARS\cite{mars} project provides a MapReduce\cite{mapreduce} run-time, executing on \ac{GPU} systems.
 It aims to take advantage of the significant computational resources available on \ac{GPU} devices. To utilise available graphics hardware, it uses NVIDIA's \ac{CUDA} library. It is one of the earliest research papers presenting the idea of dispatching general-purpose tasks to \ac{GPU} hardware.
 
 MARS attempts to overcome key obstacles, faced when trying to produce a \ac{GPU} computing platform.
 A \ac{GPU}'s high throughput, provided by its massively parallel structure, is only maintained if task idling is avoided. In addition, mapping of work units must avoid cores becoming under-utilised and producing artificial critical paths. Balancing tasks and scheduling them effectively is important. MARS demonstrates a procedure for load-balancing work-units across \ac{GPU} devices in order to avoid such idling.
 
-One shortcoming of MARS is its reliance on the MapReduce computation pattern for general purpose tasks. MapReduce is well suited to computation on large quantities of unstructured data. However, when execution is constrained to a single device host, the redundant infrastructure provided by the runtime is no longer beneficial. The communication pattern can produce unnecessary overhead.
+One shortcoming of MARS is its reliance on the MapReduce computation pattern for general purpose tasks. MapReduce is well suited to computation on large quantities of unstructured data. However, when execution is constrained to a single device host, the redundant infrastructure provided by the run-time is no longer beneficial. The communication pattern can produce unnecessary overhead.
 
 Another disadvantage of MARS is the need to write the individual task code as \ac{CUDA} source files. This is inconvenient for any programmer lacking prior knowledge of parallel programming. To utilise MARS effectively, you must first become familiar with \ac{CUDA} programming.
 

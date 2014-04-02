@@ -5,7 +5,7 @@ In order to facilitate measurement, a benchmarking suite for easy graph creation
 In addition, an execution mode that displays timing information alongside results was added to the \verb|Logger|.
 
 \subsection{Custom benchmarking environment}
-During the lifetime of the project, a benchmarking library was created. It was originally designed as personal project, but was utilised heavily during development of the library.  The \verb|Asymptotic| library eases the production of graphs that plot function runtime over a range of input sizes.
+During the lifetime of the project, a benchmarking library was created. It was originally designed as personal project, but was utilised heavily during development of the library.  The \verb|Asymptotic| library eases the production of graphs that plot function run-time over a range of input sizes.
 
 A user provides several parameters to the library:
 \begin{itemize}
@@ -59,17 +59,17 @@ Asymptotic::Graph.plot(5, "squaring integers and filtering evens",
 )
 \end{lstlisting}
 
-The library handles generating an average runtime, using the specified number of test iterations, for each $(function, \|input\|)$ pair.
+The library handles generating an average run-time, using the specified number of test iterations, for each $(function, \|input\|)$ pair.
 The garbage collector is turned off for the duration of each test and manual sweeping is triggered after each measurement is taken.
 A graph is then produced, using the \verb|gnuplot| library, that compares the performance of all provided functions.
 
-The ability to effortlessly create runtime graphs, for arbitrary given functions, proved useful during experimental development.
+The ability to effortlessly create run-time graphs, for arbitrary given functions, proved useful during experimental development.
 When changes were introduced into the codebase, corresponding feature flags were added to the configuration module.
 Then, the benchmark environment was be used to plot the performance of the feature turned off against the performance with the feature enabled.
 This made it easy to highlight changes in design that altered performance for a given task over a variety of input sizes.
 
 \subsection{Segmented timing information from execution environment}
-Overall execution time is an important metric. However, it is helpful to be able to tell what proportion of time is spend doing various tasks during runtime.
+Overall execution time is an important metric. However, it is helpful to be able to tell what proportion of time is spend doing various tasks during run-time.
 
 In order to achieve this, code that gathers timing information was introduced to the library's native extensions that interact with hardware devices.
 
@@ -78,7 +78,7 @@ The low-level code, handling device management, obtains measurements via observi
 This data could then be retrieved by the library and inspected to determine the duration of subtasks, transferring or processing data.
 
 Execution duration measurements are taken by native interaction modules, and presented to the management system.
-To make these readings available, configuration flags were added to the \verb|Logger| stating that this data should be displayed during runtime.
+To make these readings available, configuration flags were added to the \verb|Logger| stating that this data should be displayed during run-time.
 
 An example of the finer granularity of timing information presented is given in Listing~\ref{lst:segment_times}.
 \begin{lstlisting}[

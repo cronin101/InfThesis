@@ -13,11 +13,11 @@ The project will provide its functionality to users through the utilisation of t
 \section{Project Progression}
 \subsection{Timeline}
 \paragraph*{Initial focus}
-In the project's first year, most of the time was spent researching existing parallel frameworks. The project's initial goal was to present a \emph{MapReduce} runtime. Therefore, systems like \verb|Phoenix++|\cite{phoenix++} and \verb|StreamMR|\cite{streammr} were evaluated.
+In the project's first year, most of the time was spent researching existing parallel frameworks. The project's initial goal was to present a \emph{MapReduce} run-time. Therefore, systems like \verb|Phoenix++|\cite{phoenix++} and \verb|StreamMR|\cite{streammr} were evaluated.
 
 Part-way through the year, during prototyping, it became clear that there are several disadvantages to producing (yet-another) \emph{MapReduce} system:
 \begin{itemize}
-\item The runtime resource management is overkill on a singular, massively parallel machine. When isolated failure is unlikely, more lightweight processing paradigms can be used with greater efficiency.
+\item The run-time resource management is overkill on a singular, massively parallel machine. When isolated failure is unlikely, more lightweight processing paradigms can be used with greater efficiency.
 
 \item Previous projects have hit issues caused by \ac{GPU} architecture. For example, tasks that emit tuples must be run twice: Once to count the number of tuples emitted, and again to actually produce the results. This is needed as \ac{OpenCL} kernels do not allow dynamic allocation of memory.
 
@@ -128,7 +128,7 @@ As a basic metric of the amount of work involved, the size of the produced codeb
 
   \item[Back-end library] $3$ C files, providing the ability, given a suitable kernel, to dispatch all implemented parallel tasks on hardware devices via the \ac{OpenCL} library, a total of $1226$ \ac{LoC}.
 
-  \item[Native extension] $1$ C file, containing $563$ \ac{LoC}, enabling the Ruby runtime to perform parallel tasks by orchestrating the use of primitives defined in the back-end. Also contains a $16$ \ac{LoC} Ruby file that generates the $201$ \ac{LoC} \verb|Makefile| needed to build the project.
+  \item[Native extension] $1$ C file, containing $563$ \ac{LoC}, enabling the Ruby run-time to perform parallel tasks by orchestrating the use of primitives defined in the back-end. Also contains a $16$ \ac{LoC} Ruby file that generates the $201$ \ac{LoC} \verb|Makefile| needed to build the project.
 
   \item[Test suite] $19$ Ruby files, written using the \verb|RSpec| library, ensuring system correctness by performing a comprehensive set of tests. $566$ \ac{LoC} in total.
   \end{description}
